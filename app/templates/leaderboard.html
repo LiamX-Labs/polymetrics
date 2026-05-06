@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Live Leaderboard - Polymetrics{% endblock %}
+
+{% block content %}
+<header style="background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-orange) 100%); padding: 40px; border-radius: 16px; margin-bottom: 30px;">
+    <h1 style="font-size: 2.5rem; font-weight: 700; color: white;">🏆 Live Polymarket Leaderboard</h1>
+    <p style="font-size: 1.1rem; opacity: 0.95; color: white; margin-top: 10px;">
+        Real-time trader rankings from Polymarket's official API
+    </p>
+</header>
+
+<!-- Filter Controls -->
+<div style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(124, 58, 237, 0.2); border-radius: 16px; padding: 24px; margin-bottom: 30px;">
+    <!-- Category Filter -->
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">
+            📊 Category
+        </label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            {% for cat in categories %}
+            <button class="filter-btn {{ 'active' if cat == selected_category else '' }}"
+                    onclick="updateFilter('category', '{{ cat }}')">
+                {{ cat }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Time Period Filter -->
+    <div>
+        <label style="display: block; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">
+            ⏱️ Time Period
+        </label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            {% for period in time_periods %}
+            <button class="filter-btn {{ 'active' if period == selected_period else '' }}"
+                    onclick="updateFilter('period', '{{ period }}')">
+                {{ period }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Live Leaderboard Table -->
+<h2 class="section-header" style="margin-bottom: 20px;">
+    🔥 {{ selected_category }} - {{ selected_period }} Rankings
+</h2>
+
+<div class="table-container" style="margin-bottom: 40px;">
+    <table id="liveLeaderboardTable">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Trader</th>
+                <th>PnL</th>
+                <th>Volume</th>
+                <th>Win Rate</th>
+                <th>Profit Factor</th>
+                <th>Style</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trader in live_traders[:10] %}
+            <tr onclick="{% if trader.in_database %}window.location.href='/wallet/{{ trader.address }}'{% endif %}"
+                style="{% if trader.in_database %}cursor: pointer;{% else %}opacity: 0.7;{% endif %}">
+                <td style="font-weight: 700; color: var(--primary-orange); font-size: 1.1rem;">{{ trader.rank }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {% if trader.profileImage %}
+                        <img src="{{ trader.profileImage }}"
+                             style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(124, 58, 237, 0.3);"
+                             alt="Profile">
+                        {% endif %}
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">
+                                {{ trader.userName }}
+                                {% if trader.verifiedBadge %}
+                                <span style="color: var(--success-color);">✓</span>
+                                {% endif %}
+                            </div>
+                            <div style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary);">
+                                {{ trader.address[:10] }}...{{ trader.address[-8:] }}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="{{ 'positive-value' if trader.pnl >= 0 else 'negative-value' }}" style="font-weight: 700;">
+                    ${{ "{:,.2f}".format(trader.pnl) }}
+                </td>
+                <td style="font-weight: 600;">${{ "{:,.0f}".format(trader.vol) }}</td>
+                <td>
+                    {% if trader.win_rate is not none %}
+                    <span class="positive-value">{{ "{:.1f}".format(trader.win_rate) }}%</span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.profit_factor is not none %}
+                    <span class="positive-value">{{ "{:.2f}".format(trader.profit_factor) }}</span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.trading_style and trader.trading_style != 'Unknown' %}
+                    <span class="badge {{ trader.trading_style }}">
+                        {{ trader.trading_style.upper() }}
+                    </span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.in_database %}
+                    <span style="color: var(--success-color); font-size: 0.85rem;">✓ Analyzed</span>
+                    {% else %}
+                    <button class="analyze-btn"
+                            onclick="event.stopPropagation(); analyzeWallet('{{ trader.address }}')"
+                            style="padding: 4px 12px; font-size: 0.85rem; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: var(--primary-purple); border-radius: 6px; cursor: pointer; transition: all 0.3s;">
+                        Analyze
+                    </button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+            <!-- Hidden rows for "View More" -->
+            {% for trader in live_traders[10:] %}
+            <tr class="hidden-live-row" style="display: none; {% if trader.in_database %}cursor: pointer;{% else %}opacity: 0.7;{% endif %}"
+                onclick="{% if trader.in_database %}window.location.href='/wallet/{{ trader.address }}'{% endif %}">
+                <td style="font-weight: 700; color: var(--primary-orange); font-size: 1.1rem;">{{ trader.rank }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {% if trader.profileImage %}
+                        <img src="{{ trader.profileImage }}"
+                             style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(124, 58, 237, 0.3);"
+                             alt="Profile">
+                        {% endif %}
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">
+                                {{ trader.userName }}
+                                {% if trader.verifiedBadge %}
+                                <span style="color: var(--success-color);">✓</span>
+                                {% endif %}
+                            </div>
+                            <div style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary);">
+                                {{ trader.address[:10] }}...{{ trader.address[-8:] }}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="{{ 'positive-value' if trader.pnl >= 0 else 'negative-value' }}" style="font-weight: 700;">
+                    ${{ "{:,.2f}".format(trader.pnl) }}
+                </td>
+                <td style="font-weight: 600;">${{ "{:,.0f}".format(trader.vol) }}</td>
+                <td>
+                    {% if trader.win_rate is not none %}
+                    <span class="positive-value">{{ "{:.1f}".format(trader.win_rate) }}%</span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.profit_factor is not none %}
+                    <span class="positive-value">{{ "{:.2f}".format(trader.profit_factor) }}</span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.trading_style and trader.trading_style != 'Unknown' %}
+                    <span class="badge {{ trader.trading_style }}">
+                        {{ trader.trading_style.upper() }}
+                    </span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.in_database %}
+                    <span style="color: var(--success-color); font-size: 0.85rem;">✓ Analyzed</span>
+                    {% else %}
+                    <button class="analyze-btn"
+                            onclick="event.stopPropagation(); analyzeWallet('{{ trader.address }}')"
+                            style="padding: 4px 12px; font-size: 0.85rem; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: var(--primary-purple); border-radius: 6px; cursor: pointer; transition: all 0.3s;">
+                        Analyze
+                    </button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if live_traders|length > 10 %}
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="toggleLiveLeaderboard" class="view-more-btn"
+                onclick="toggleLiveRows()"
+                style="padding: 10px 28px; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: var(--primary-purple); border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.95rem; transition: all 0.3s;">
+            View More ({{ live_traders|length - 10 }} more traders)
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Our Database Leaderboard -->
+<h2 class="section-header" style="margin-top: 60px;">💾 Our Analyzed Wallets (All-Time)</h2>
+
+<div class="table-container">
+    <table id="analyzedWalletsTable">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Wallet</th>
+                <th>Total PnL</th>
+                <th>Win Rate</th>
+                <th>Profit Factor</th>
+                <th>Positions</th>
+                <th>Volume</th>
+                <th>Style</th>
+                <th>Last Analyzed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for wallet in analyzed_wallets[:10] %}
+            <tr onclick="window.location.href='/wallet/{{ wallet.address }}'" style="cursor: pointer;">
+                <td style="font-weight: 700; font-size: 1.1rem;">{{ loop.index }}</td>
+                <td style="font-family: monospace; font-size: 0.85rem;">{{ wallet.short_address }}</td>
+                <td class="{{ 'positive-value' if wallet.total_pnl >= 0 else 'negative-value' }}">
+                    ${{ "{:,.2f}".format(wallet.total_pnl) }}
+                </td>
+                <td>{{ "{:.1f}".format(wallet.win_rate) }}%</td>
+                <td class="{{ 'positive-value' if wallet.profit_factor > 1 else 'negative-value' }}">
+                    {{ "{:.2f}".format(wallet.profit_factor) }}
+                </td>
+                <td>{{ "{:,}".format(wallet.total_positions) }}</td>
+                <td>${{ "{:,.0f}".format(wallet.total_volume) }}</td>
+                <td>
+                    <span class="badge {{ wallet.trading_style }}">{{ wallet.trading_style.upper() }}</span>
+                </td>
+                <td>{{ wallet.last_analyzed.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+
+            <!-- Hidden rows for "View More" -->
+            {% for wallet in analyzed_wallets[10:] %}
+            <tr class="hidden-analyzed-row" style="display: none; cursor: pointer;"
+                onclick="window.location.href='/wallet/{{ wallet.address }}'">
+                <td style="font-weight: 700; font-size: 1.1rem;">{{ loop.index + 10 }}</td>
+                <td style="font-family: monospace; font-size: 0.85rem;">{{ wallet.short_address }}</td>
+                <td class="{{ 'positive-value' if wallet.total_pnl >= 0 else 'negative-value' }}">
+                    ${{ "{:,.2f}".format(wallet.total_pnl) }}
+                </td>
+                <td>{{ "{:.1f}".format(wallet.win_rate) }}%</td>
+                <td class="{{ 'positive-value' if wallet.profit_factor > 1 else 'negative-value' }}">
+                    {{ "{:.2f}".format(wallet.profit_factor) }}
+                </td>
+                <td>{{ "{:,}".format(wallet.total_positions) }}</td>
+                <td>${{ "{:,.0f}".format(wallet.total_volume) }}</td>
+                <td>
+                    <span class="badge {{ wallet.trading_style }}">{{ wallet.trading_style.upper() }}</span>
+                </td>
+                <td>{{ wallet.last_analyzed.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if analyzed_wallets|length > 10 %}
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="toggleAnalyzedWallets" class="view-more-btn"
+                onclick="toggleAnalyzedRows()"
+                style="padding: 10px 28px; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: var(--primary-purple); border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.95rem; transition: all 0.3s;">
+            View More ({{ analyzed_wallets|length - 10 }} more wallets)
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.filter-btn {
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    background: rgba(124, 58, 237, 0.2);
+    border-color: rgba(124, 58, 237, 0.5);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange));
+    border-color: transparent;
+    color: white;
+}
+
+.analyze-btn:hover {
+    background: rgba(124, 58, 237, 0.4);
+    border-color: rgba(124, 58, 237, 0.6);
+    transform: translateY(-1px);
+}
+
+.view-more-btn:hover {
+    background: rgba(124, 58, 237, 0.4);
+    border-color: rgba(124, 58, 237, 0.6);
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+function updateFilter(param, value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set(param, value);
+    window.location.href = url.toString();
+}
+
+function analyzeWallet(address) {
+    // Redirect to analyze API endpoint which will trigger analysis and redirect to wallet page
+    window.location.href = '/api/analyze?address=' + address;
+}
+
+// Toggle live leaderboard rows
+let liveRowsShown = false;
+function toggleLiveRows() {
+    const hiddenRows = document.querySelectorAll('.hidden-live-row');
+    const btn = document.getElementById('toggleLiveLeaderboard');
+
+    if (liveRowsShown) {
+        hiddenRows.forEach(row => row.style.display = 'none');
+        btn.textContent = 'View More (' + hiddenRows.length + ' more traders)';
+        liveRowsShown = false;
+    } else {
+        hiddenRows.forEach(row => row.style.display = '');
+        btn.textContent = 'View Less';
+        liveRowsShown = true;
+    }
+}
+
+// Toggle analyzed wallets rows
+let analyzedRowsShown = false;
+function toggleAnalyzedRows() {
+    const hiddenRows = document.querySelectorAll('.hidden-analyzed-row');
+    const btn = document.getElementById('toggleAnalyzedWallets');
+
+    if (analyzedRowsShown) {
+        hiddenRows.forEach(row => row.style.display = 'none');
+        btn.textContent = 'View More (' + hiddenRows.length + ' more wallets)';
+        analyzedRowsShown = false;
+    } else {
+        hiddenRows.forEach(row => row.style.display = '');
+        btn.textContent = 'View Less';
+        analyzedRowsShown = true;
+    }
+}
+</script>
+{% endblock %}

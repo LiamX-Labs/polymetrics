@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Wallets - Polymetrics{% endblock %}
+
+{% block content %}
+<header style="background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-orange) 100%); padding: 40px; border-radius: 16px; margin-bottom: 30px;">
+    <h1 style="font-size: 2.5rem; font-weight: 700; color: white;">⚖️ Compare Wallets</h1>
+    <p style="font-size: 1.1rem; opacity: 0.95; color: white; margin-top: 10px;">
+        Side-by-side performance comparison
+    </p>
+</header>
+
+<!-- Wallet Selection Form -->
+<div class="table-container" style="margin-bottom: 30px;">
+    <h3 style="margin-bottom: 20px;">Select Wallets to Compare (up to 4)</h3>
+    <form method="get" action="/compare">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <input type="text" name="wallet" placeholder="Wallet Address 1" value="{{ addresses[0] if addresses|length > 0 else '' }}"
+                   style="padding: 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-primary);">
+            <input type="text" name="wallet" placeholder="Wallet Address 2" value="{{ addresses[1] if addresses|length > 1 else '' }}"
+                   style="padding: 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-primary);">
+            <input type="text" name="wallet" placeholder="Wallet Address 3 (optional)" value="{{ addresses[2] if addresses|length > 2 else '' }}"
+                   style="padding: 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-primary);">
+            <input type="text" name="wallet" placeholder="Wallet Address 4 (optional)" value="{{ addresses[3] if addresses|length > 3 else '' }}"
+                   style="padding: 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-primary);">
+        </div>
+        <button type="submit" style="padding: 12px 30px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange)); border: none; border-radius: 8px; color: white; font-weight: 700; cursor: pointer;">
+            Compare Wallets
+        </button>
+    </form>
+</div>
+
+{% if wallets %}
+<!-- Comparison Table -->
+<div class="section-header">Performance Comparison</div>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Metric</th>
+                {% for wallet in wallets %}
+                <th>{{ wallet.short_address }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="font-weight: 700;">Total PnL</td>
+                {% for wallet in wallets %}
+                <td class="{{ 'positive-value' if wallet.total_pnl >= 0 else 'negative-value' }}">
+                    ${{ "{:,.2f}".format(wallet.total_pnl) }}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Win Rate</td>
+                {% for wallet in wallets %}
+                <td>{{ "{:.1f}".format(wallet.win_rate) }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Profit Factor</td>
+                {% for wallet in wallets %}
+                <td class="{{ 'positive-value' if wallet.profit_factor > 1 else 'negative-value' }}">
+                    {{ "{:.2f}".format(wallet.profit_factor) }}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Risk/Reward Ratio</td>
+                {% for wallet in wallets %}
+                <td>{{ "{:.2f}".format(wallet.risk_reward_ratio) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Total Positions</td>
+                {% for wallet in wallets %}
+                <td>{{ "{:,}".format(wallet.total_positions) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Best Trade</td>
+                {% for wallet in wallets %}
+                <td class="positive-value">${{ "{:,.2f}".format(wallet.best_trade) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Worst Trade</td>
+                {% for wallet in wallets %}
+                <td class="negative-value">${{ "{:,.2f}".format(wallet.worst_trade) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Total Volume</td>
+                {% for wallet in wallets %}
+                <td>${{ "{:,.0f}".format(wallet.total_volume) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Avg Position Size</td>
+                {% for wallet in wallets %}
+                <td>{{ "{:,.0f}".format(wallet.avg_position_size) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="font-weight: 700;">Trading Style</td>
+                {% for wallet in wallets %}
+                <td>
+                    <span class="badge {{ wallet.trading_style }}">{{ wallet.trading_style.upper() }}</span>
+                </td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Individual Links -->
+<div style="display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
+    {% for wallet in wallets %}
+    <a href="/wallet/{{ wallet.address }}" style="flex: 1; min-width: 200px; padding: 15px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; text-decoration: none; text-align: center; transition: all 0.3s;">
+        <div style="font-family: monospace; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 5px;">
+            {{ wallet.short_address }}
+        </div>
+        <div style="color: var(--primary-orange); font-weight: 700;">View Full Analysis →</div>
+    </a>
+    {% endfor %}
+</div>
+
+{% elif addresses %}
+<div class="table-container">
+    <p style="text-align: center; padding: 40px; color: var(--text-secondary);">
+        No wallets found. Make sure the addresses have been analyzed first.
+    </p>
+</div>
+{% endif %}
+
+{% endblock %}

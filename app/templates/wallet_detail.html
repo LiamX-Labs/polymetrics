@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}Polymetrics - {{ wallet.short_address }} Analysis{% endblock %}
+
+{% block content %}
+<!-- Minimal Wallet Header with Glassmorphism -->
+<header class="wallet-header-glass">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div style="flex: 1; min-width: 300px;">
+            <div class="wallet-address-container">
+                <code class="wallet-address" id="wallet-address">{{ wallet.address }}</code>
+                <button class="copy-btn" onclick="copyAddress()" title="Copy address">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+                <span class="copy-feedback" id="copy-feedback">Copied!</span>
+            </div>
+            <div class="last-updated">
+                Last updated: {{ wallet.last_analyzed.strftime('%Y-%m-%d %H:%M UTC') }}
+            </div>
+        </div>
+        <div class="time-range-selector">
+            <button class="time-btn {{ 'active' if time_range == '1d' else '' }}" data-range="1d">1D</button>
+            <button class="time-btn {{ 'active' if time_range == '7d' else '' }}" data-range="7d">7D</button>
+            <button class="time-btn {{ 'active' if time_range == '30d' else '' }}" data-range="30d">30D</button>
+            <button class="time-btn {{ 'active' if time_range == '90d' else '' }}" data-range="90d">90D</button>
+            <button class="time-btn {{ 'active' if time_range == 'ytd' else '' }}" data-range="ytd">YTD</button>
+            <button class="time-btn {{ 'active' if time_range == 'all' else '' }}" data-range="all">ALL</button>
+        </div>
+    </div>
+</header>
+
+<style>
+.wallet-header-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.wallet-address-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.wallet-address {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #E5E7EB;
+    background: rgba(124, 58, 237, 0.1);
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    flex: 1;
+    max-width: 600px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.copy-btn {
+    background: rgba(124, 58, 237, 0.2);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #E5E7EB;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copy-btn:hover {
+    background: rgba(124, 58, 237, 0.3);
+    border-color: rgba(124, 58, 237, 0.6);
+    transform: translateY(-1px);
+}
+
+.copy-feedback {
+    position: absolute;
+    left: 620px;
+    background: rgba(16, 185, 129, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.copy-feedback.show {
+    opacity: 1;
+}
+
+.last-updated {
+    font-size: 13px;
+    color: #9CA3AF;
+    font-style: italic;
+}
+
+.time-range-selector {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.time-btn {
+    background: transparent;
+    border: none;
+    color: #9CA3AF;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.time-btn:hover {
+    background: rgba(124, 58, 237, 0.2);
+    color: #E5E7EB;
+}
+
+.time-btn.active {
+    background: linear-gradient(135deg, #7C3AED 0%, #F97316 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+}
+
+@media (max-width: 768px) {
+    .wallet-address {
+        font-size: 12px;
+        max-width: 100%;
+    }
+
+    .time-range-selector {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .time-btn {
+        flex: 1;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}
+</style>
+
+<script>
+function copyAddress() {
+    const address = document.getElementById('wallet-address').textContent;
+    navigator.clipboard.writeText(address).then(() => {
+        const feedback = document.getElementById('copy-feedback');
+        feedback.classList.add('show');
+        setTimeout(() => feedback.classList.remove('show'), 2000);
+    });
+}
+
+// Time range filter functionality
+let currentTimeRange = 'all';
+
+document.querySelectorAll('.time-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Update active state
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        // Update current range
+        currentTimeRange = this.dataset.range;
+
+        // Reload data for active tab
+        const activeTab = document.querySelector('.tab-content.active').id;
+        filterDataByTimeRange(currentTimeRange, activeTab);
+    });
+});
+
+function filterDataByTimeRange(range, tab) {
+    console.log(`Filtering ${tab} tab to ${range} time range`);
+    // This will be implemented to filter positions and regenerate charts
+    // For now, we'll reload the page with query param
+    window.location.href = `?range=${range}#${tab}`;
+}
+</script>
+
+<!-- Tab Navigation -->
+<nav class="nav-tabs">
+    <div class="nav-tab active" onclick="showTab('overview')">Overview</div>
+    <div class="nav-tab" onclick="showTab('charts')">Charts</div>
+    <div class="nav-tab" onclick="showTab('top-trades')">Top Trades</div>
+    <div class="nav-tab" onclick="showTab('all-positions')">All Positions</div>
+</nav>
+
+<!-- Overview Tab -->
+<div id="overview" class="tab-content active">
+    {% set metrics = filtered_metrics if filtered_metrics else wallet %}
+    <div class="metrics-grid">
+        <div class="metric-card {{ 'positive' if metrics.total_pnl >= 0 else 'negative' }}">
+            <div class="metric-label">Total Realized PnL</div>
+            <div class="metric-value {{ 'positive' if metrics.total_pnl >= 0 else 'negative' }}">
+                ${{ "{:,.2f}".format(metrics.total_pnl) }}
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Positions</div>
+            <div class="metric-value">{{ metrics.total_positions }}</div>
+        </div>
+        <div class="metric-card {{ 'positive' if metrics.win_rate >= 60 else '' }}">
+            <div class="metric-label">Win Rate</div>
+            <div class="metric-value {{ 'positive' if metrics.win_rate >= 60 else '' }}">
+                {{ "{:.1f}".format(metrics.win_rate) }}%
+            </div>
+        </div>
+        <div class="metric-card {{ 'positive' if metrics.profit_factor > 1 else 'negative' }}">
+            <div class="metric-label">Profit Factor</div>
+            <div class="metric-value {{ 'positive' if metrics.profit_factor > 1 else 'negative' }}">
+                {{ "{:.2f}".format(metrics.profit_factor) }}
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Risk/Reward Ratio</div>
+            <div class="metric-value">{{ "{:.2f}".format(metrics.risk_reward_ratio) }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Trading Style</div>
+            <div class="metric-value">
+                <span class="badge {{ wallet.trading_style }}">{{ wallet.trading_style.upper() }}</span>
+            </div>
+        </div>
+        <div class="metric-card {{ 'positive' if metrics.best_trade > 0 else '' }}">
+            <div class="metric-label">Best Trade</div>
+            <div class="metric-value positive">${{ "{:,.2f}".format(metrics.best_trade) }}</div>
+        </div>
+        <div class="metric-card {{ 'negative' if metrics.worst_trade < 0 else '' }}">
+            <div class="metric-label">Worst Trade</div>
+            <div class="metric-value negative">${{ "{:,.2f}".format(metrics.worst_trade) }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Avg Position Size</div>
+            <div class="metric-value">{{ "{:,.0f}".format(metrics.avg_position_size) }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Volume</div>
+            <div class="metric-value">${{ "{:,.0f}".format(metrics.total_volume) }}</div>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-title">Cumulative PnL Over Time</div>
+            <div id="cumulative-pnl-mini"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Win/Loss Distribution</div>
+            <div id="win-loss-pie-mini"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Tab -->
+<div id="charts" class="tab-content">
+    <div class="chart-container">
+        <div class="chart-title">Cumulative PnL Over Time</div>
+        <div id="cumulative-pnl"></div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-title">Win/Loss Distribution</div>
+            <div id="win-loss-pie"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">PnL Distribution</div>
+            <div id="pnl-histogram"></div>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-title">PnL by Outcome</div>
+            <div id="outcome-bar"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">PnL by Hour of Day</div>
+            <div id="hourly-bar"></div>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-title">Position Size Distribution</div>
+            <div id="position-size-hist"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">ROI Distribution</div>
+            <div id="roi-histogram"></div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">Drawdown Over Time</div>
+        <div id="drawdown-chart"></div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-title">Entry Price vs PnL</div>
+            <div id="entry-pnl-scatter"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Position Size vs PnL</div>
+            <div id="size-pnl-scatter"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Trades Tab -->
+<div id="top-trades" class="tab-content">
+    <div class="section-header">🏆 Top 10 Winning Trades</div>
+    <div class="table-container">
+        <table>
+            <thead class="success">
+                <tr>
+                    <th>Market</th>
+                    <th>Outcome</th>
+                    <th>PnL</th>
+                    <th>Entry Price</th>
+                    <th>Size</th>
+                    <th>Trades</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pos in top_winners %}
+                <tr>
+                    <td>{{ pos.short_market_title }}</td>
+                    <td>{{ pos.outcome }}</td>
+                    <td class="positive-value">${{ "{:,.2f}".format(pos.realized_pnl) }}</td>
+                    <td>${{ "{:.4f}".format(pos.avg_entry_price) }}</td>
+                    <td>{{ "{:,.0f}".format(pos.position_size) }}</td>
+                    <td>{{ pos.num_trades }}</td>
+                    <td>{{ pos.close_timestamp.strftime('%Y-%m-%d %H:%M') if pos.close_timestamp else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-header">📉 Top 10 Losing Trades</div>
+    <div class="table-container">
+        <table>
+            <thead class="danger">
+                <tr>
+                    <th>Market</th>
+                    <th>Outcome</th>
+                    <th>PnL</th>
+                    <th>Entry Price</th>
+                    <th>Size</th>
+                    <th>Trades</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pos in top_losers %}
+                <tr>
+                    <td>{{ pos.short_market_title }}</td>
+                    <td>{{ pos.outcome }}</td>
+                    <td class="negative-value">${{ "{:,.2f}".format(pos.realized_pnl) }}</td>
+                    <td>${{ "{:.4f}".format(pos.avg_entry_price) }}</td>
+                    <td>{{ "{:,.0f}".format(pos.position_size) }}</td>
+                    <td>{{ pos.num_trades }}</td>
+                    <td>{{ pos.close_timestamp.strftime('%Y-%m-%d %H:%M') if pos.close_timestamp else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- All Positions Tab -->
+<div id="all-positions" class="tab-content">
+    <div class="section-header">All Closed Positions ({{ wallet.total_positions }} total)</div>
+    <input type="text" class="search-box" id="search-positions" placeholder="Search by market, outcome, or any field..." onkeyup="filterPositions()">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Close Time</th>
+                    <th>Market</th>
+                    <th>Side</th>
+                    <th>Entry Price</th>
+                    <th>Size</th>
+                    <th>Exit Price</th>
+                    <th>Trades</th>
+                    <th>PnL ($)</th>
+                    <th>ROI (%)</th>
+                </tr>
+            </thead>
+            <tbody id="positions-tbody">
+                <!-- Populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Inject chart data from Python backend
+    const chartData = {{ chart_data|safe }};
+    const allPositionsData = {{ all_positions_data|safe }};
+
+    console.log('Chart data loaded:', chartData ? 'Yes' : 'No');
+    console.log('Positions data loaded:', allPositionsData ? allPositionsData.length + ' positions' : 'No data');
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            initializeOverviewCharts();
+            renderTable();
+            renderPagination();
+            console.log('✅ Charts initialized successfully');
+        } catch (error) {
+            console.error('❌ Error initializing charts:', error);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Analyzing Wallet - Polymetrics{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin-top: 80px;">
+    <div class="card" style="text-align: center; padding: 60px 40px;">
+        <!-- Animated Logo/Icon -->
+        <div class="analyzing-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-dasharray="60" stroke-dashoffset="0" class="spinner"/>
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#F97316;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <h1 style="margin-top: 30px; margin-bottom: 10px;">Analyzing Wallet</h1>
+        <p style="color: #9CA3AF; margin-bottom: 40px;">
+            <code style="background: rgba(124, 58, 237, 0.1); padding: 4px 12px; border-radius: 6px; font-size: 14px;">
+                {{ wallet_address[:10] }}...{{ wallet_address[-6:] }}
+            </code>
+        </p>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" style="width: 5%;"></div>
+        </div>
+        <p id="progress-text" style="margin-top: 12px; font-size: 14px; color: #9CA3AF;">
+            Starting analysis...
+        </p>
+
+        <!-- Stats Display -->
+        <div id="progress-stats" style="margin-top: 30px; display: none;">
+            <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 600; color: #7C3AED;" id="fetched-count">0</div>
+                    <div style="font-size: 12px; color: #9CA3AF; margin-top: 4px;">Positions Fetched</div>
+                </div>
+                <div id="total-container" style="display: none;">
+                    <div style="font-size: 24px; font-weight: 600; color: #F97316;" id="total-count">-</div>
+                    <div style="font-size: 12px; color: #9CA3AF; margin-top: 4px;">Total Estimated</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 600; color: #10B981;" id="elapsed-time">0s</div>
+                    <div style="font-size: 12px; color: #9CA3AF; margin-top: 4px;">Elapsed Time</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="error-container" style="display: none; margin-top: 30px;">
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 20px;">
+                <p style="color: #EF4444; margin: 0;" id="error-message"></p>
+                <a href="/" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Return Home</a>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div id="tips-container" style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(124, 58, 237, 0.1);">
+            <p style="font-size: 13px; color: #6B7280; line-height: 1.6;">
+                💡 <strong>Tip:</strong> Large wallets with 1000+ positions may take 20-30 seconds to analyze.<br>
+                The analysis runs in the background and will automatically load when complete.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.analyzing-icon {
+    display: inline-block;
+}
+
+.spinner {
+    animation: rotate 2s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #7C3AED 0%, #F97316 100%);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.card {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<script>
+const walletAddress = "{{ wallet_address }}";
+const progressUrl = "{{ url_for('wallet.analysis_progress', address=wallet_address) }}";
+let startTime = Date.now();
+let pollInterval;
+
+function updateProgress() {
+    fetch(progressUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Update progress bar
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = Math.max(5, data.progress) + '%';
+
+            // Update message
+            document.getElementById('progress-text').textContent = data.message || 'Processing...';
+
+            // Update stats
+            if (data.fetched_positions > 0) {
+                document.getElementById('progress-stats').style.display = 'block';
+                document.getElementById('fetched-count').textContent = data.fetched_positions.toLocaleString();
+
+                if (data.total_positions && data.total_positions > data.fetched_positions) {
+                    document.getElementById('total-container').style.display = 'block';
+                    document.getElementById('total-count').textContent = data.total_positions.toLocaleString();
+                }
+            }
+
+            // Update elapsed time
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('elapsed-time').textContent = elapsed + 's';
+
+            // Handle completion
+            if (data.status === 'complete' && data.redirect) {
+                document.getElementById('progress-text').textContent = '✓ Analysis complete! Redirecting...';
+                progressBar.style.width = '100%';
+                clearInterval(pollInterval);
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 500);
+            }
+
+            // Handle error
+            if (data.status === 'error') {
+                clearInterval(pollInterval);
+                document.getElementById('tips-container').style.display = 'none';
+                document.getElementById('progress-stats').style.display = 'none';
+                document.getElementById('error-container').style.display = 'block';
+                document.getElementById('error-message').textContent = data.error || 'An unknown error occurred';
+                progressBar.style.background = 'linear-gradient(90deg, #EF4444 0%, #DC2626 100%)';
+            }
+        })
+        .catch(error => {
+            console.error('Error polling progress:', error);
+        });
+}
+
+// Start polling every 500ms
+updateProgress();
+pollInterval = setInterval(updateProgress, 500);
+
+// Stop polling after 5 minutes (failsafe)
+setTimeout(() => {
+    clearInterval(pollInterval);
+}, 300000);
+</script>
+{% endblock %}

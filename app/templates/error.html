@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Polymetrics{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 80px 20px;">
+    <div style="font-size: 4rem; margin-bottom: 20px;">⚠️</div>
+    <h1 style="font-size: 2rem; color: var(--danger-color); margin-bottom: 15px;">
+        {{ error }}
+    </h1>
+    <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 30px;">
+        {{ message }}
+    </p>
+    <a href="/" style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange)); color: white; text-decoration: none; border-radius: 12px; font-weight: 700;">
+        Go Home
+    </a>
+</div>
+{% endblock %}

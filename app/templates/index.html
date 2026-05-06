@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Polymetrics - Polymarket Wallet Analytics Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<header style="background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(124, 58, 237, 0.2); padding: 50px 40px; border-radius: 20px; margin-bottom: 40px; position: relative; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+    <!-- Arithmetic Symbols Splash Effect -->
+    <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); opacity: 0.15; pointer-events: none; z-index: 0; width: 250px; height: 400px;">
+        <div class="float-symbol" style="position: absolute; font-size: 120px; color: var(--primary-purple); transform: rotate(-15deg); font-weight: 700; line-height: 1; top: 0; left: 20px; animation: float1 6s ease-in-out infinite;">+</div>
+        <div class="float-symbol" style="position: absolute; font-size: 100px; color: var(--primary-orange); transform: rotate(10deg); font-weight: 700; line-height: 1; top: 60px; left: -10px; animation: float2 7s ease-in-out infinite;">×</div>
+        <div class="float-symbol" style="position: absolute; font-size: 90px; color: var(--primary-purple); transform: rotate(-20deg); font-weight: 700; line-height: 1; top: 120px; left: 60px; animation: float3 8s ease-in-out infinite;">÷</div>
+        <div class="float-symbol" style="position: absolute; font-size: 110px; color: var(--primary-orange); transform: rotate(25deg); font-weight: 700; line-height: 1; top: 180px; left: 10px; animation: float1 7.5s ease-in-out infinite;">−</div>
+        <div class="float-symbol" style="position: absolute; font-size: 95px; color: var(--primary-purple); transform: rotate(18deg); font-weight: 700; line-height: 1; top: 240px; left: 70px; animation: float2 6.5s ease-in-out infinite;">=</div>
+        <div class="float-symbol" style="position: absolute; font-size: 105px; color: var(--primary-orange); transform: rotate(-12deg); font-weight: 700; line-height: 1; top: 300px; left: -5px; animation: float3 7s ease-in-out infinite;">%</div>
+        <div class="float-symbol" style="position: absolute; font-size: 85px; color: var(--primary-purple); transform: rotate(22deg); font-weight: 700; line-height: 1; top: 50px; left: 100px; animation: float1 8.5s ease-in-out infinite;">√</div>
+        <div class="float-symbol" style="position: absolute; font-size: 115px; color: var(--primary-orange); transform: rotate(-18deg); font-weight: 700; line-height: 1; top: 150px; left: 110px; animation: float2 6s ease-in-out infinite;">π</div>
+        <div class="float-symbol" style="position: absolute; font-size: 80px; color: var(--primary-purple); transform: rotate(30deg); font-weight: 700; line-height: 1; top: 220px; left: 130px; animation: float3 7.5s ease-in-out infinite;">∞</div>
+        <div class="float-symbol" style="position: absolute; font-size: 92px; color: var(--primary-orange); transform: rotate(-25deg); font-weight: 700; line-height: 1; top: 10px; left: 140px; animation: float1 6.5s ease-in-out infinite;">∑</div>
+        <div class="float-symbol" style="position: absolute; font-size: 88px; color: var(--primary-purple); transform: rotate(15deg); font-weight: 700; line-height: 1; top: 280px; left: 100px; animation: float2 8s ease-in-out infinite;">∫</div>
+        <div class="float-symbol" style="position: absolute; font-size: 98px; color: var(--primary-orange); transform: rotate(-8deg); font-weight: 700; line-height: 1; top: 340px; left: 50px; animation: float3 6.5s ease-in-out infinite;">≠</div>
+    </div>
+
+    <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 30px;">
+        <!-- Logo -->
+        <img src="{{ url_for('static', filename='images/logo2.jpg') }}"
+             style="width: 120px; height: 120px; border-radius: 16px; border: 2px solid rgba(124, 58, 237, 0.4); box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);"
+             alt="Polymetrics Logo">
+
+        <!-- Text Content -->
+        <div>
+            <h1 style="font-size: 2.8rem; font-weight: 700; margin-bottom: 12px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Polymetrics
+            </h1>
+            <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500;">
+                Advanced Analytics Platform for Polymarket Traders
+            </p>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); opacity: 0.8;">
+                Analyze any wallet address • Compare traders • Discover top performers
+            </p>
+        </div>
+    </div>
+</header>
+
+<!-- Platform Statistics -->
+<div class="metrics-grid" style="margin-bottom: 40px;">
+    <div class="metric-card">
+        <div class="metric-label">Total Wallets Analyzed</div>
+        <div class="metric-value">{{ "{:,}".format(total_wallets) }}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Total Positions Tracked</div>
+        <div class="metric-value">{{ "{:,}".format(total_positions) }}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Total Volume</div>
+        <div class="metric-value">${{ "{:,.0f}".format(total_volume) }}</div>
+    </div>
+</div>
+
+<!-- Top 5 Daily Traders from Polymarket -->
+<h2 class="section-header">🔥 Top 5 Daily Traders</h2>
+
+<div class="table-container" style="margin-bottom: 40px;">
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Trader</th>
+                <th>24h PnL</th>
+                <th>24h Volume</th>
+                <th>Win Rate</th>
+                <th>Style</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trader in top_daily_traders %}
+            <tr onclick="{% if trader.in_database %}window.location.href='/wallet/{{ trader.address }}'{% endif %}"
+                style="{% if trader.in_database %}cursor: pointer;{% else %}opacity: 0.8;{% endif %}">
+                <td style="font-weight: 700; color: var(--primary-orange); font-size: 1.2rem;">{{ trader.rank }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        {% if trader.profileImage %}
+                        <img src="{{ trader.profileImage }}"
+                             style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(124, 58, 237, 0.4);"
+                             alt="Profile">
+                        {% endif %}
+                        <div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: 1.05rem;">
+                                {{ trader.userName }}
+                                {% if trader.verifiedBadge %}
+                                <span style="color: var(--success-color); font-size: 1.1rem;">✓</span>
+                                {% endif %}
+                            </div>
+                            <div style="font-family: monospace; font-size: 0.8rem; color: var(--text-secondary);">
+                                {{ trader.address[:10] }}...{{ trader.address[-8:] }}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="{{ 'positive-value' if trader.pnl >= 0 else 'negative-value' }}" style="font-weight: 700; font-size: 1.05rem;">
+                    ${{ "{:,.2f}".format(trader.pnl) }}
+                </td>
+                <td style="font-weight: 600;">${{ "{:,.0f}".format(trader.vol) }}</td>
+                <td>
+                    {% if trader.win_rate is not none %}
+                    <span class="positive-value" style="font-weight: 600;">{{ "{:.1f}".format(trader.win_rate) }}%</span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.trading_style and trader.trading_style != 'Unknown' %}
+                    <span class="badge {{ trader.trading_style }}">
+                        {{ trader.trading_style.upper() }}
+                    </span>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if trader.in_database %}
+                    <span style="color: var(--success-color); font-size: 0.9rem; font-weight: 600;">✓ Analyzed</span>
+                    {% else %}
+                    <button class="analyze-btn"
+                            onclick="event.stopPropagation(); analyzeWallet('{{ trader.address }}')"
+                            style="padding: 6px 16px; font-size: 0.9rem; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: var(--primary-purple); border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                        Analyze
+                    </button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="/leaderboard" style="display: inline-block; padding: 12px 32px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange)); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 1rem; transition: all 0.3s;">
+            View Full Leaderboard →
+        </a>
+    </div>
+</div>
+
+<style>
+.analyze-btn:hover {
+    background: rgba(124, 58, 237, 0.4);
+    border-color: rgba(124, 58, 237, 0.6);
+    transform: translateY(-1px);
+}
+
+/* Floating animation for arithmetic symbols - mixed chaotic movement */
+@keyframes float1 {
+    0% {
+        transform: translate(0, 0) rotate(-15deg);
+    }
+    25% {
+        transform: translate(15px, -25px) rotate(5deg);
+    }
+    50% {
+        transform: translate(-10px, -15px) rotate(-25deg);
+    }
+    75% {
+        transform: translate(20px, -30px) rotate(10deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(-15deg);
+    }
+}
+
+@keyframes float2 {
+    0% {
+        transform: translate(0, 0) rotate(10deg);
+    }
+    25% {
+        transform: translate(-18px, -20px) rotate(-15deg);
+    }
+    50% {
+        transform: translate(12px, -28px) rotate(20deg);
+    }
+    75% {
+        transform: translate(-8px, -12px) rotate(-5deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(10deg);
+    }
+}
+
+@keyframes float3 {
+    0% {
+        transform: translate(0, 0) rotate(-20deg);
+    }
+    25% {
+        transform: translate(10px, -18px) rotate(15deg);
+    }
+    50% {
+        transform: translate(-15px, -32px) rotate(-30deg);
+    }
+    75% {
+        transform: translate(18px, -22px) rotate(8deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(-20deg);
+    }
+}
+
+.float-symbol {
+    transition: opacity 0.3s ease;
+    will-change: transform;
+}
+</style>
+
+<script>
+function analyzeWallet(address) {
+    // Redirect to analyze page (will be handled by API route)
+    window.location.href = '/api/analyze?address=' + address;
+}
+</script>
+
+<!-- Leaderboards -->
+<h2 class="section-header">🏆 Top Traders (Our Database)</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-bottom: 40px;">
+    <!-- Top by PnL -->
+    <div class="table-container">
+        <h3 style="color: var(--primary-orange); margin-bottom: 20px; font-size: 1.2rem;">
+            💰 Highest PnL
+        </h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Wallet</th>
+                    <th>PnL</th>
+                    <th>Positions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wallet in top_by_pnl %}
+                <tr onclick="window.location.href='/wallet/{{ wallet.address }}'" style="cursor: pointer;">
+                    <td>{{ loop.index }}</td>
+                    <td style="font-family: monospace; font-size: 0.85rem;">{{ wallet.short_address }}</td>
+                    <td class="{{ 'positive-value' if wallet.total_pnl >= 0 else 'negative-value' }}">
+                        ${{ "{:,.2f}".format(wallet.total_pnl) }}
+                    </td>
+                    <td>{{ wallet.total_positions }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Top by Win Rate -->
+    <div class="table-container">
+        <h3 style="color: var(--success-color); margin-bottom: 20px; font-size: 1.2rem;">
+            🎯 Highest Win Rate
+        </h3>
+        <table>
+            <thead class="success">
+                <tr>
+                    <th>Rank</th>
+                    <th>Wallet</th>
+                    <th>Win Rate</th>
+                    <th>Positions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wallet in top_by_win_rate %}
+                <tr onclick="window.location.href='/wallet/{{ wallet.address }}'" style="cursor: pointer;">
+                    <td>{{ loop.index }}</td>
+                    <td style="font-family: monospace; font-size: 0.85rem;">{{ wallet.short_address }}</td>
+                    <td class="positive-value">{{ "{:.1f}".format(wallet.win_rate) }}%</td>
+                    <td>{{ wallet.total_positions }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Top by Profit Factor -->
+    <div class="table-container">
+        <h3 style="color: var(--primary-purple); margin-bottom: 20px; font-size: 1.2rem;">
+            📈 Best Profit Factor
+        </h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Wallet</th>
+                    <th>Factor</th>
+                    <th>Positions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wallet in top_by_profit_factor %}
+                <tr onclick="window.location.href='/wallet/{{ wallet.address }}'" style="cursor: pointer;">
+                    <td>{{ loop.index }}</td>
+                    <td style="font-family: monospace; font-size: 0.85rem;">{{ wallet.short_address }}</td>
+                    <td class="positive-value">{{ "{:.2f}".format(wallet.profit_factor) }}</td>
+                    <td>{{ wallet.total_positions }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recently Analyzed -->
+<h2 class="section-header">🕐 Recently Analyzed</h2>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Wallet</th>
+                <th>Last Analyzed</th>
+                <th>PnL</th>
+                <th>Win Rate</th>
+                <th>Positions</th>
+                <th>Style</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for wallet in recent_wallets %}
+            <tr onclick="window.location.href='/wallet/{{ wallet.address }}'" style="cursor: pointer;">
+                <td style="font-family: monospace;">{{ wallet.short_address }}</td>
+                <td>{{ wallet.last_analyzed.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td class="{{ 'positive-value' if wallet.total_pnl >= 0 else 'negative-value' }}">
+                    ${{ "{:,.2f}".format(wallet.total_pnl) }}
+                </td>
+                <td>{{ "{:.1f}".format(wallet.win_rate) }}%</td>
+                <td>{{ wallet.total_positions }}</td>
+                <td>
+                    <span class="badge {{ wallet.trading_style }}">
+                        {{ wallet.trading_style.upper() }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Call to Action -->
+<div style="text-align: center; margin: 60px 0;">
+    <h2 style="font-size: 2rem; margin-bottom: 20px; color: var(--text-primary);">
+        Ready to analyze a wallet?
+    </h2>
+    <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 30px;">
+        Enter any Polymarket wallet address in the search bar above to get started
+    </p>
+    <a href="/leaderboard" style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange)); color: white; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; transition: all 0.3s;">
+        View Full Leaderboard
+    </a>
+</div>
+
+{% endblock %}

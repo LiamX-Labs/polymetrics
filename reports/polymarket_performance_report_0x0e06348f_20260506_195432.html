@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymarket Performance Report - 0x0e06348f...b142f0</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-purple: #7C3AED;
+            --secondary-purple: #5B21B6;
+            --dark-purple: #4C1D95;
+            --primary-orange: #F97316;
+            --secondary-orange: #FB923C;
+            --success-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --bg-color: #0F0A1E;
+            --bg-gradient: linear-gradient(135deg, #0F0A1E 0%, #1A0B2E 50%, #160E2E 100%);
+            --card-bg: rgba(124, 58, 237, 0.08);
+            --card-border: rgba(124, 58, 237, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #E5E7EB;
+            --text-secondary: #9CA3AF;
+            --text-accent: #FCD34D;
+            --border-color: rgba(124, 58, 237, 0.15);
+            --shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+            --shadow-hover: 0 12px 48px rgba(249, 115, 22, 0.25);
+            --glow-purple: 0 0 20px rgba(124, 58, 237, 0.3);
+            --glow-orange: 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 20% 30%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, rgba(249, 115, 22, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 100%, rgba(124, 58, 237, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-orange) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow), var(--glow-purple);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(249, 115, 22, 0.2) 100%);
+            pointer-events: none;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            opacity: 0.95;
+            word-break: break-all;
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+
+        .timestamp {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-tab:hover::before {
+            left: 100%;
+        }
+
+        .nav-tab:hover {
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-purple);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange));
+            color: white;
+            border-color: var(--primary-orange);
+            box-shadow: var(--glow-orange);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--primary-purple);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-5px);
+            border-color: var(--primary-orange);
+        }
+
+        .metric-card.positive {
+            border-left-color: var(--success-color);
+        }
+
+        .metric-card.positive:hover {
+            box-shadow: 0 12px 48px rgba(16, 185, 129, 0.25);
+        }
+
+        .metric-card.negative {
+            border-left-color: var(--danger-color);
+        }
+
+        .metric-card.negative:hover {
+            box-shadow: 0 12px 48px rgba(239, 68, 68, 0.25);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-value.positive {
+            color: var(--success-color);
+        }
+
+        .metric-value.negative {
+            color: var(--danger-color);
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-purple);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            border-bottom: 2px solid transparent;
+            background: linear-gradient(90deg, var(--primary-purple), var(--primary-orange)) left bottom no-repeat;
+            background-size: 100% 2px;
+            padding-bottom: 10px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange));
+            color: white;
+        }
+
+        thead.success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        thead.danger {
+            background: linear-gradient(135deg, var(--danger-color), #DC2626);
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(124, 58, 237, 0.1), rgba(249, 115, 22, 0.1));
+            transform: scale(1.01);
+        }
+
+        .positive-value {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .negative-value {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge.hft {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .badge.active {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            color: white;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .badge.normal {
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 30px 0 20px 0;
+            color: var(--text-primary);
+        }
+
+        .table-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .search-box::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: var(--glow-purple);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange));
+            color: white;
+            border-color: var(--primary-orange);
+            box-shadow: var(--glow-purple);
+        }
+
+        .pagination button.active {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-orange));
+            color: white;
+            border-color: var(--primary-orange);
+            box-shadow: var(--glow-orange);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .metric-card {
+                padding: 14px;
+            }
+
+            .metric-label {
+                font-size: 0.75rem;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .nav-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+
+            .nav-tab {
+                white-space: nowrap;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .metric-value {
+                font-size: 1.4rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            th, td {
+                padding: 10px 6px;
+                white-space: nowrap;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .table-container {
+                padding: 12px;
+                overflow-x: auto;
+            }
+
+            .chart-title {
+                font-size: 1.1rem;
+            }
+
+            .section-header {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            header {
+                padding: 15px;
+            }
+
+            .wallet-address {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .metric-card {
+                padding: 12px;
+            }
+
+            .metric-label {
+                font-size: 0.7rem;
+                margin-bottom: 4px;
+            }
+
+            .metric-value {
+                font-size: 1.1rem;
+            }
+
+            table {
+                font-size: 0.7rem;
+            }
+
+            th, td {
+                padding: 8px 4px;
+            }
+
+            .chart-container, .table-container {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
+            .chart-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .section-header {
+                font-size: 1.1rem;
+                margin: 20px 0 15px 0;
+            }
+
+            .search-box {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+
+            .pagination button {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Loading indicator */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Print styles */
+        @media print {
+            .nav-tabs, .search-box, .pagination {
+                display: none;
+            }
+
+            .tab-content {
+                display: block !important;
+                page-break-after: always;
+            }
+
+            .chart-container, .table-container {
+                box-shadow: none;
+                border: 1px solid var(--border-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Polymetrics</h1>
+            <p style="font-size: 1.1rem; margin: 8px 0 16px 0; opacity: 0.95; position: relative; z-index: 1;">Trading Performance Report</p>
+            <div class="wallet-address">Wallet: 0x0e06348f...b142f0</div>
+            <div class="timestamp">Generated: 2026-05-06 19:54:32</div>
+        </header>
+
+        <nav class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('overview')">Overview</div>
+            <div class="nav-tab" onclick="showTab('charts')">Charts</div>
+            <div class="nav-tab" onclick="showTab('top-trades')">Top Trades</div>
+            <div class="nav-tab" onclick="showTab('all-positions')">All Positions</div>
+        </nav>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="metrics-grid">
+                
+<div class="metric-card positive">
+    <div class="metric-label">Total Realized PnL</div>
+    <div class="metric-value positive">$1,804.35</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Trading Style</div>
+    <div class="metric-value"><span class="badge normal">📊 Normal Trader</span></div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Total Positions</div>
+    <div class="metric-value">139</div>
+</div>
+<div class="metric-card positive">
+    <div class="metric-label">Win Rate</div>
+    <div class="metric-value">74.10%</div>
+</div>
+<div class="metric-card positive">
+    <div class="metric-label">Average Win</div>
+    <div class="metric-value">$18.67</div>
+</div>
+<div class="metric-card negative">
+    <div class="metric-label">Average Loss</div>
+    <div class="metric-value">$-3.30</div>
+</div>
+<div class="metric-card positive">
+    <div class="metric-label">Best Trade</div>
+    <div class="metric-value positive">$121.20</div>
+</div>
+<div class="metric-card negative">
+    <div class="metric-label">Worst Trade</div>
+    <div class="metric-value negative">$-23.73</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Risk/Reward Ratio</div>
+    <div class="metric-value">5.66</div>
+</div>
+<div class="metric-card positive">
+    <div class="metric-label">Profit Factor</div>
+    <div class="metric-value">16.19</div>
+</div>
+<div class="metric-card negative">
+    <div class="metric-label">Max Drawdown</div>
+    <div class="metric-value negative">$-41.02</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Max Consecutive Wins</div>
+    <div class="metric-value">15</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Max Consecutive Losses</div>
+    <div class="metric-value">4</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Avg Position Size</div>
+    <div class="metric-value">1348.27</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Avg Positions/Hour</div>
+    <div class="metric-value">1.8</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Median Time Between Positions</div>
+    <div class="metric-value">52.0 min</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Total Trades Executed</div>
+    <div class="metric-value">440</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Trading Duration</div>
+    <div class="metric-value">712.7 hrs</div>
+</div>
+
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">Cumulative PnL Over Time</div>
+                    <div id="cumulative-pnl-mini"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Win/Loss Distribution</div>
+                    <div id="win-loss-pie-mini"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Tab -->
+        <div id="charts" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-title">Cumulative PnL Over Time</div>
+                <div id="cumulative-pnl"></div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">Win/Loss Distribution</div>
+                    <div id="win-loss-pie"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">PnL Distribution</div>
+                    <div id="pnl-histogram"></div>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">PnL by Outcome</div>
+                    <div id="outcome-bar"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">PnL by Hour of Day</div>
+                    <div id="hourly-bar"></div>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">Position Size Distribution</div>
+                    <div id="position-size-hist"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">ROI Distribution</div>
+                    <div id="roi-histogram"></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Drawdown Over Time</div>
+                <div id="drawdown-chart"></div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">Entry Price vs PnL</div>
+                    <div id="entry-pnl-scatter"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Position Size vs PnL</div>
+                    <div id="size-pnl-scatter"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Trades Tab -->
+        <div id="top-trades" class="tab-content">
+            <div class="section-header">🏆 Top 10 Winning Trades</div>
+            <div class="table-container">
+                <table id="winners-table">
+                    <thead class="success">
+                        <tr>
+                            <th>Market</th>
+                            <th>Outcome</th>
+                            <th>PnL</th>
+                            <th>Entry Price</th>
+                            <th>Size</th>
+                            <th>Trades</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+    <tr>
+        <td>Will the highest temperature in Seoul be 20°C or higher on May 1?</td>
+        <td>No</td>
+        <td class="positive-value">$121.20</td>
+        <td>$0.9760</td>
+        <td>5059.19</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 19°C or higher on April 29?</td>
+        <td>No</td>
+        <td class="positive-value">$103.52</td>
+        <td>$0.9771</td>
+        <td>4894.44</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 24°C or higher on April 14?</td>
+        <td>No</td>
+        <td class="positive-value">$100.15</td>
+        <td>$0.9753</td>
+        <td>4060.61</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 23°C or higher on April 13?</td>
+        <td>No</td>
+        <td class="positive-value">$99.71</td>
+        <td>$0.8643</td>
+        <td>734.71</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 20°C on April 25?</td>
+        <td>Yes</td>
+        <td class="positive-value">$87.67</td>
+        <td>$0.9795</td>
+        <td>4286.04</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-header">📉 Top 10 Losing Trades</div>
+            <div class="table-container">
+                <table id="losers-table">
+                    <thead class="danger">
+                        <tr>
+                            <th>Market</th>
+                            <th>Outcome</th>
+                            <th>PnL</th>
+                            <th>Entry Price</th>
+                            <th>Size</th>
+                            <th>Trades</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+    <tr>
+        <td>Will the highest temperature in Seoul be 20°C or higher on May 1?</td>
+        <td>Yes</td>
+        <td class="negative-value">$-23.73</td>
+        <td>$0.3423</td>
+        <td>111.00</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 19°C on May 1?</td>
+        <td>Yes</td>
+        <td class="negative-value">$-17.29</td>
+        <td>$0.4131</td>
+        <td>99.24</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 16°C on May 3?</td>
+        <td>Yes</td>
+        <td class="negative-value">$-14.28</td>
+        <td>$0.2121</td>
+        <td>155.33</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 16°C on April 29?</td>
+        <td>Yes</td>
+        <td class="negative-value">$-8.35</td>
+        <td>$0.1538</td>
+        <td>71.50</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+    <tr>
+        <td>Will the highest temperature in Seoul be 21°C on April 23?</td>
+        <td>Yes</td>
+        <td class="negative-value">$-6.00</td>
+        <td>$0.1844</td>
+        <td>32.54</td>
+        <td>N/A</td>
+        <td>-</td>
+    </tr>
+    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- All Positions Tab -->
+        <div id="all-positions" class="tab-content">
+            <div class="section-header">All Closed Positions (139 total)</div>
+            <input type="text" class="search-box" id="search-positions" placeholder="Search by market, outcome, or any field..." onkeyup="filterPositions()">
+            <div class="table-container">
+                <table id="all-positions-table">
+                    <thead>
+                        <tr>
+                            <th>Close Time</th>
+                            <th>Market</th>
+                            <th>Side</th>
+                            <th>Entry Price</th>
+                            <th>Size</th>
+                            <th>Exit Price</th>
+                            <th>Trades</th>
+                            <th>PnL ($)</th>
+                            <th>ROI (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positions-tbody">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        // Chart data injected by Python
+        const chartData = {"cumulative_pnl": {"timestamps": ["2026-04-06 22:30", "2026-04-07 07:43", "2026-04-07 21:51", "2026-04-08 03:52", "2026-04-08 23:15", "2026-04-09 23:00", "2026-04-09 23:00", "2026-04-11 01:20", "2026-04-11 04:42", "2026-04-11 23:42", "2026-04-11 23:42", "2026-04-12 23:08", "2026-04-13 06:06", "2026-04-13 21:58", "2026-04-13 21:58", "2026-04-14 04:56", "2026-04-14 04:56", "2026-04-14 06:06", "2026-04-14 22:12", "2026-04-14 22:12", "2026-04-15 03:34", "2026-04-16 05:56", "2026-04-16 05:56", "2026-04-16 10:12", "2026-04-17 23:22", "2026-04-17 23:22", "2026-04-18 05:04", "2026-04-18 23:56", "2026-04-18 23:56", "2026-04-19 03:25", "2026-04-19 05:05", "2026-04-20 03:30", "2026-04-20 03:30", "2026-04-20 03:30", "2026-04-20 23:59", "2026-04-20 23:59", "2026-04-21 03:44", "2026-04-21 05:38", "2026-04-21 23:23", "2026-04-22 05:46", "2026-04-22 23:47", "2026-04-22 23:47", "2026-04-23 23:02", "2026-04-23 23:02", "2026-04-24 03:53", "2026-04-24 05:35", "2026-04-24 05:36", "2026-04-25 01:33", "2026-04-25 03:19", "2026-04-25 04:09", "2026-04-25 04:09", "2026-04-25 05:23", "2026-04-25 05:37", "2026-04-25 05:37", "2026-04-26 15:01", "2026-04-26 15:01", "2026-04-27 01:13", "2026-04-28 03:52", "2026-04-28 07:55", "2026-04-28 07:56", "2026-04-28 07:57", "2026-04-29 00:26", "2026-04-29 00:27", "2026-04-29 00:28", "2026-04-29 01:13", "2026-04-29 01:35", "2026-04-29 01:35", "2026-04-29 01:38", "2026-04-29 07:12", "2026-04-29 22:57", "2026-04-30 01:28", "2026-04-30 01:30", "2026-04-30 06:34", "2026-04-30 06:34", "2026-04-30 06:41", "2026-04-30 06:43", "2026-04-30 22:33", "2026-04-30 22:35", "2026-05-01 03:20", "2026-05-01 03:57", "2026-05-01 06:27", "2026-05-01 06:39", "2026-05-01 23:35", "2026-05-01 23:48", "2026-05-01 23:50", "2026-05-02 01:11", "2026-05-02 03:22", "2026-05-02 05:09", "2026-05-02 05:12", "2026-05-02 05:47", "2026-05-02 21:24", "2026-05-03 00:21", "2026-05-03 02:13", "2026-05-03 02:23", "2026-05-03 02:51", "2026-05-03 05:18", "2026-05-03 08:45", "2026-05-03 09:16", "2026-05-03 09:16", "2026-05-03 20:45", "2026-05-04 01:02", "2026-05-04 01:41", "2026-05-04 05:07", "2026-05-04 05:19", "2026-05-04 05:58", "2026-05-04 21:16", "2026-05-05 05:56", "2026-05-05 06:33", "2026-05-05 06:39", "2026-05-05 06:50", "2026-05-05 06:57", "2026-05-05 07:53", "2026-05-05 07:54", "2026-05-05 07:57", "2026-05-05 08:04", "2026-05-05 08:05", "2026-05-05 08:20", "2026-05-05 08:44", "2026-05-05 09:05", "2026-05-05 23:14", "2026-05-06 01:06", "2026-05-06 01:23", "2026-05-06 02:13", "2026-05-06 02:26", "2026-05-06 03:12", "2026-05-06 03:12", "2026-05-06 03:42", "2026-05-06 04:46", "2026-05-06 04:48", "2026-05-06 05:50", "2026-05-06 06:44", "2026-05-06 06:44", "2026-05-06 11:09", "2026-05-06 15:07", "2026-05-06 15:07", "2026-05-06 15:08", "2026-05-06 15:09", "2026-05-06 15:10", "2026-05-06 15:10"], "values": [21.22187205102, 32.246358258819996, 38.07871631962, 44.86327162002, 76.563091334821, 91.129444274781, 92.206369328621, 100.10658133192099, 102.46935258323099, 105.93593338563099, 146.72476960078097, 164.25316598308098, 169.477703485481, 249.949994271785, 349.66466666901, 347.664673454794, 344.664687246971, 343.664687246971, 349.664687246971, 449.81153291033706, 477.6475950371371, 491.7054784685371, 494.9698837691691, 496.2111238691691, 512.4166157037212, 568.6683327037211, 575.7005509257691, 574.7005625313791, 573.744081046879, 580.3283047642791, 584.6332437642791, 583.6439283679811, 582.7402328913131, 581.7402414180451, 581.9407674180451, 594.321739468045, 638.156649224995, 637.27025282617, 694.61223747317, 697.58621017317, 702.20328031977, 721.27703761257, 773.444377783124, 794.79124354103, 809.34019796243, 806.340222072738, 800.340285371828, 800.6237064769571, 800.6239314769571, 868.2660967195111, 867.175510824887, 954.8489507086416, 953.8489507086416, 952.8489507086416, 957.1068228206417, 959.1706006766416, 977.7178881397775, 976.9586927112045, 1008.4478021866805, 1004.3122476469275, 1068.5974748906651, 1072.9596401438412, 1072.5096401438411, 1072.4568437579421, 1074.570886577429, 1066.216000088524, 1065.5910390504039, 1066.411456386679, 1169.9325437943203, 1175.3612655985223, 1185.4091434049185, 1191.4082672609184, 1194.7348968635083, 1198.5965307555084, 1234.3241315587884, 1263.0433118378244, 1266.5350437398242, 1270.1518973795821, 1246.4207122871321, 1229.129573101608, 1271.3754727692078, 1392.5785772942156, 1393.2296346963406, 1394.2824929363405, 1396.6700437363404, 1401.0998425282844, 1443.7166999697004, 1444.8656550986334, 1439.6208961404534, 1462.4102112148582, 1463.4637492964832, 1469.9406737229733, 1473.3013269038254, 1494.8740006262258, 1551.3057675633577, 1537.0244871937678, 1540.1495566004328, 1540.2601314659837, 1540.3757324615597, 1541.1939134615598, 1542.6251605634718, 1556.5778515292898, 1584.0837558128098, 1622.0017919754248, 1630.0545355764248, 1636.608407760425, 1635.136213304007, 1678.642458320739, 1711.481683902755, 1710.581588306087, 1739.941924098371, 1737.5154404455868, 1734.5835482537668, 1733.9776035940688, 1732.5386143877367, 1733.5773920385518, 1734.2898723901199, 1736.45418439012, 1732.804768644852, 1735.923612224852, 1755.8835746595419, 1759.327197991878, 1772.4673862608558, 1772.4461953777688, 1773.393015370569, 1774.4467934143258, 1775.489329421826, 1786.4263421430098, 1788.528355909758, 1789.5759842222578, 1796.8707993168177, 1794.6079439427137, 1790.3476714972137, 1802.8358635192587, 1804.1827570266087, 1804.3613310962967, 1804.3413310962967, 1804.3268447776218, 1804.3501862832018]}, "win_loss": {"labels": ["Wins", "Losses", "Breakeven"], "values": [103, 36, 0]}, "pnl_distribution": [0.02334150558, -0.014486318675000002, -0.02, 0.178574069688, 1.34689350735, 12.488192022045, -4.260272445499999, -2.262855374104, 7.294815094560022, 1.0476283125000094, 2.102013766747973, 10.937012721183919, 1.0425360075000043, 1.0537780437569992, 0.9468199928000001, -0.021190883086999998, 13.140188268977965, 3.443623332336, 19.959962434690055, 3.118843579999975, -3.6494157452679996, 2.164312, 0.7124803515679999, 1.038777650815, -1.438989206332, -0.6059446596979999, -2.93189219182, -2.426483652784, 29.360335792283877, -0.900095596668, 32.83922558201607, 43.50624501673201, -1.472194456418, 6.553872184000284, 8.052743600999975, 37.91803616261495, 27.50590428352001, 13.952690965817993, 1.4312471019120494, 0.8181809999999998, 0.11560099557599912, 0.11057486555100127, 3.125069406665, -14.28128036959, 56.431766937132, 21.572673722400395, 3.3606531808520117, 6.476924426490001, 1.0535380816249926, 22.78931507440484, -5.24475895818, 1.1489551289330002, 42.61685744141596, 4.429798791943995, 2.3875507999998717, 1.0528582399999777, 0.6510574021249909, 121.2031045250078, 42.2458996675999, -17.291139185524003, -23.73118509245, 3.616853639757892, 3.491731901999856, 28.71918027903598, 35.727600803279984, 3.861633892, 3.32662960259, 5.999123855999983, 10.047877806396173, 5.428721804202041, 103.52108740764123, 0.820417336275, -0.6249610381199999, -8.354886488905, 2.11404281948694, -0.052796385899, -0.45, 4.362165253176045, 64.28522724373761, -4.135554539753, 31.489109475476, -0.759195428573, 18.547287463135945, 2.063777855999888, 4.257872112000086, -1.0, -1.0, 87.67343988375458, -1.0905858946240001, 67.642165242554, 0.00022500000000000298, 0.28342110512900004, -5.999936700909999, -2.9999758896919997, 14.5489544214, 21.346865757905995, 52.167340170554, 19.0737572928, 4.6170701466, 2.9739727000000005, 57.341984647000004, -0.886396398825, 43.834909756950005, 0.200526, 12.38097205, -0.999991473268, -0.903695476668, -0.989315396298, 4.304938999999999, 6.5842237174000005, -0.9564814845, -0.99998839439, 7.032218222048001, 56.251717, 16.205491834552, 1.2412401, 3.264405300632, 14.0578834314, 27.836062126799998, 6.0, 100.14684566336601, -1.0, -2.999986207823, -1.999993214216, 99.714672397225, 80.472290786304, 5.2245375024, 17.5283963823, 40.78883621515, 3.4665808023999998, 2.36277125131, 7.9002120033, 1.0769250538400001, 14.566352939960002, 31.699819714800995, 6.7845553004, 5.832358060800001, 11.024486207799999, 21.22187205102], "outcome_pnl": {"outcomes": ["Doosan Bears", "Hanwha Eagles", "KT Wiz", "Kia Tigers", "Kiwoom Heroes", "LG Twins", "Lotte Giants", "NC Dinos", "No", "SSG Landers", "Samsung Lions", "Up", "Yes"], "values": [-1.438989206332, -2.93189219182, -3.2681033473430006, 2.164312, -0.900095596668, 15.931815354381001, -2.2925672816529987, -3.6494157452679996, 1410.5991482687703, -0.625944659698, 3.2038521581649997, 3.125069406665, 384.4329971240028]}, "hourly_pnl": {"hours": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], "values": [10.336293293767046, 79.94985748939813, 94.48409122627537, 100.57439975564196, 76.9533976651329, 184.8848983271924, 349.14625678673366, 200.22003529059984, 5.601650202716, -3.4232398841409992, 1.2412401, -4.260272445499999, 0.0, 0.0, 0.0, 20.324164753987976, 0.0, 0.0, 0.0, 0.0, 0.8181809999999998, 193.62673150995428, 139.9060250603458, 353.9664761510979]}, "position_sizes": [2.32558, 5.427835, 2.0, 7.883858, 9.472925, 73.366963, 12.214149, 122.833332, 885.293094, 86.0475, 711.100733, 1734.932221, 85.0425, 15.053757, 14.9468, 5.827701, 493.139243, 7.443612, 868.957877, 1723.118, 18.223134, 4.168473, 7.720186, 2.040815, 5.103356, 3.030302, 6.81818, 9.255087, 1207.349938, 3.333332, 1054.838288, 3089.493326, 3.773582, 5268.386, 1357.0515, 3528.900527, 378.504256, 213.952387, 988.430319, 1.81818, 23.115576, 22.110551, 4.166665, 155.33333, 92.431693, 4722.5643, 331.360006, 28.476882, 131.053375, 1147.787211, 18.888884, 19.148933, 1324.615592, 1136.428628, 1690.9, 940.052, 400.650709, 5059.193744, 3281.4894, 99.238092, 110.997367, 1244.615843, 1645.491, 1778.717966, 2144.25644, 1085.947, 1218.544183, 987.998, 1612.045212, 880.428447, 4894.435133, 36.919175, 39.108156, 71.504443, 1927.112871, 2.564101, 50.0, 2590.359414, 4651.271778, 2466.534073, 2132.567538, 3.571427, 4563.801049, 1602.312, 1430.256, 6.25, 10.0, 4286.036255, 7.061468, 267.641731, 4395.795, 21.739129, 32.53921, 16.764702, 4394.127, 1454.344327, 2930.914146, 2992.901, 1329.036, 2973.973, 4298.1774, 2.941175, 4245.40075, 4.01052, 4196.94, 8.333332, 3.3333319999999995, 3.703702, 1076.23475, 3114.581, 32.55, 11.11111, 4098.0297279999995, 4160.63, 19.205462, 1241.241, 2273.263262, 1833.7965, 4091.132, 8.0, 4060.610882, 12.5, 13.043477, 5.714284, 734.714175, 3242.758344, 3162.553, 3793.2042, 1509.18845, 2268.705, 2265.36167, 3731.796, 3.076922, 3721.60272, 3710.619207, 3679.26, 3672.77, 3667.494, 494.221533], "roi_distribution": [2.3341573867641676, -0.4828786502929342, -2.0, 4.464367668483436, 26.937976133658953, 37.84374069396283, -72.74205201158466, -75.43264532157863, 0.8308461724610818, 1.2325057575987761, 0.2964763841916668, 0.6343992528902151, 1.2411148266600303, 7.52699734085735, 6.763009606535605, -1.0595488041338363, 2.737544613778741, 86.09082721094514, 2.351002528069769, 0.18132820404932784, -30.411873437388003, 108.21605122468124, 10.17831212796157, 103.87804459810057, -71.94982343541521, -60.594670192138146, -97.72998790221308, -97.0915940052717, 2.4924104370071287, -90.00989570362394, 3.2132344137694786, 1.4283135108599299, -73.60991838706869, 0.12455494635326884, 0.5969422553432047, 1.0861709063891503, 7.836476766631084, 6.976356085777918, 0.14500997444299846, 81.81818181818178, 0.502613570465896, 0.5026135704659057, 312.5083677875254, -43.34257726306797, 156.75523010403722, 0.45889623801526214, 1.0245914060400618, 29.440622350512268, 0.8104149255867866, 2.0257206841844684, -87.4132384947428, 6.383091896906275, 3.324251131658857, 0.3913253863560153, 0.14139965631470877, 0.11212558065032599, 0.1627644922999852, 2.45450251679485, 1.3046925514695737, -42.17359250313585, -62.45057157041792, 0.29144694482164296, 0.21265124594388413, 1.641097154659125, 1.6944326365908764, 0.3572281169648331, 0.27402243053133785, 0.6109094421326275, 0.6272093961663154, 0.620425543903715, 2.164596800336176, 7.458368282041395, -5.6814892716723575, -75.95430077486375, 0.10982047305894255, -5.27965534805932, -45.0, 0.1686840639637166, 1.4014697129020102, -0.16797553627138603, 1.5002896269305197, -75.91984740422572, 0.4080583491308666, 0.12896610834754463, 0.2985888991527839, -100.0, -100.00000000000003, 2.08837367083781, -35.408789584568765, 33.82115605420292, 5.123651699527121e-06, 28.34272852975181, -99.99998716319955, -99.99998418654206, 0.3321999121887787, 1.489665288274946, 1.8121545138271984, 0.6413875367030555, 0.3486110056059996, 0.10010009000248658, 1.3521388837688328, -88.63994490806242, 1.0436091028470251, 5.2631578947368425, 0.2958728021307465, -99.99999665997163, -90.3698850475837, -98.93195155296456, 0.4016064257028112, 0.2118478297255391, -99.99997224202136, -99.99996054955773, 0.1718949524315336, 1.370529545027884, 540.1884655126123, 0.10010002751944082, 0.14380647338509533, 0.7725221252962914, 0.6850611560766136, 300.0, 2.5286644382493657, -100.0, -99.99998470993204, -99.99997642492556, 15.703110333395218, 2.544750520327155, 0.16547336029637635, 0.46424527144395517, 2.777774921273254, 0.1530338163828962, 0.10440885559554478, 0.212149116230318, 53.84635437874024, 0.3929379563095359, 0.861661166749929, 0.18474065797907216, 0.15905255642219618, 0.30150630734088263, 4.4866569321182315], "drawdown": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.9999932142159764, -4.999979422038962, -5.999979422038962, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.9999883943900159, -1.9564698788900614, 0.0, 0.0, -0.989315396298025, -1.8930108729659878, -2.8930023462339705, -2.6924763462340024, 0.0, 0.0, -0.8863963988250134, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2.9999758896919957, -8.99991259060198, -8.716491485472943, -8.716266485472943, 0.0, -1.0905858946240414, 0.0, -1.0, -2.0, 0.0, 0.0, 0.0, -0.7591954285729798, 0.0, -4.135554539753002, 0.0, 0.0, -0.4500000000000455, -0.5027963858990461, 0.0, -8.354886488905095, -8.979847527025186, -8.159430190750072, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -23.731185092450005, -41.02232427797412, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -5.24475895818, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -14.281280369589922, -11.156210962924888, -11.045636097373972, -10.930035101798012, -10.111854101797917, -8.680606999885867, 0.0, 0.0, 0.0, 0.0, 0.0, -1.4721944564180376, 0.0, 0.0, -0.9000955966680522, 0.0, -2.4264836527841, -5.358375844604097, -5.964320504302123, -7.403309710634176, -6.364532059819112, -5.652051708251065, -3.487739708250956, -7.137155453518972, -4.018311873518996, 0.0, 0.0, 0.0, -0.021190883087001566, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2.2628553741039923, -6.523127819604042, 0.0, 0.0, 0.0, -0.01999999999998181, -0.034486318674908034, -0.011144813094915662], "entry_vs_pnl": {"entry_prices": [0.429999, 0.552705, 0.5, 0.507364, 0.527818, 0.449785, 0.4795, 0.024422, 0.99176, 0.987825, 0.997044, 0.993696, 0.987741, 0.929999, 0.936654, 0.343187, 0.973354, 0.537372, 0.97703, 0.99819, 0.658502, 0.47979, 0.906712, 0.489999, 0.391897, 0.329999, 0.439999, 0.270032, 0.975682, 0.299999, 0.968868, 0.985918, 0.529999, 0.998756, 0.994066, 0.989255, 0.92733, 0.934786, 0.998552, 0.55, 0.994999, 0.994999, 0.239999, 0.212123, 0.389476, 0.995432, 0.989858, 0.772555, 0.991961, 0.980145, 0.317645, 0.939999, 0.967827, 0.996102, 0.998588, 0.99888, 0.998375, 0.976043, 0.986746, 0.413147, 0.34235, 0.997094, 0.997878, 0.983854, 0.983338, 0.995444, 0.99627, 0.993928, 0.993767, 0.993834, 0.977123, 0.297947, 0.28127, 0.153835, 0.998903, 0.389999, 0.02, 0.998316, 0.986179, 0.998161, 0.984198, 0.279999, 0.995936, 0.998712, 0.997023, 0.16, 0.09999999999999999, 0.979499, 0.43616800000000006, 0.747266, 0.999, 0.045999, 0.184391, 0.178946, 0.996689, 0.985322, 0.982201, 0.993627, 0.996526, 0.999, 0.986659, 0.339999, 0.989381, 0.95, 0.99705, 0.119999, 0.299999, 0.269999, 0.996, 0.997886, 0.029385, 0.089999, 0.998284, 0.98648, 0.156204, 0.999, 0.9985640000000001, 0.992334, 0.993196, 0.25, 0.975337, 0.08, 0.229999, 0.349999, 0.864281, 0.975184, 0.998348, 0.995379, 0.972973, 0.9984720000000001, 0.998957, 0.997883, 0.649999, 0.996086, 0.991457, 0.998156, 0.998412, 0.996994, 0.95706], "pnl": [0.02334150558, -0.014486318675000002, -0.02, 0.178574069688, 1.34689350735, 12.488192022045, -4.260272445499999, -2.262855374104, 7.294815094560022, 1.0476283125000094, 2.102013766747973, 10.937012721183919, 1.0425360075000043, 1.0537780437569992, 0.9468199928000001, -0.021190883086999998, 13.140188268977965, 3.443623332336, 19.959962434690055, 3.118843579999975, -3.6494157452679996, 2.164312, 0.7124803515679999, 1.038777650815, -1.438989206332, -0.6059446596979999, -2.93189219182, -2.426483652784, 29.360335792283877, -0.900095596668, 32.83922558201607, 43.50624501673201, -1.472194456418, 6.553872184000284, 8.052743600999975, 37.91803616261495, 27.50590428352001, 13.952690965817993, 1.4312471019120494, 0.8181809999999998, 0.11560099557599912, 0.11057486555100127, 3.125069406665, -14.28128036959, 56.431766937132, 21.572673722400395, 3.3606531808520117, 6.476924426490001, 1.0535380816249926, 22.78931507440484, -5.24475895818, 1.1489551289330002, 42.61685744141596, 4.429798791943995, 2.3875507999998717, 1.0528582399999777, 0.6510574021249909, 121.2031045250078, 42.2458996675999, -17.291139185524003, -23.73118509245, 3.616853639757892, 3.491731901999856, 28.71918027903598, 35.727600803279984, 3.861633892, 3.32662960259, 5.999123855999983, 10.047877806396173, 5.428721804202041, 103.52108740764123, 0.820417336275, -0.6249610381199999, -8.354886488905, 2.11404281948694, -0.052796385899, -0.45, 4.362165253176045, 64.28522724373761, -4.135554539753, 31.489109475476, -0.759195428573, 18.547287463135945, 2.063777855999888, 4.257872112000086, -1.0, -1.0, 87.67343988375458, -1.0905858946240001, 67.642165242554, 0.00022500000000000298, 0.28342110512900004, -5.999936700909999, -2.9999758896919997, 14.5489544214, 21.346865757905995, 52.167340170554, 19.0737572928, 4.6170701466, 2.9739727000000005, 57.341984647000004, -0.886396398825, 43.834909756950005, 0.200526, 12.38097205, -0.999991473268, -0.903695476668, -0.989315396298, 4.304938999999999, 6.5842237174000005, -0.9564814845, -0.99998839439, 7.032218222048001, 56.251717, 16.205491834552, 1.2412401, 3.264405300632, 14.0578834314, 27.836062126799998, 6.0, 100.14684566336601, -1.0, -2.999986207823, -1.999993214216, 99.714672397225, 80.472290786304, 5.2245375024, 17.5283963823, 40.78883621515, 3.4665808023999998, 2.36277125131, 7.9002120033, 1.0769250538400001, 14.566352939960002, 31.699819714800995, 6.7845553004, 5.832358060800001, 11.024486207799999, 21.22187205102]}, "size_vs_pnl": {"sizes": [2.32558, 5.427835, 2.0, 7.883858, 9.472925, 73.366963, 12.214149, 122.833332, 885.293094, 86.0475, 711.100733, 1734.932221, 85.0425, 15.053757, 14.9468, 5.827701, 493.139243, 7.443612, 868.957877, 1723.118, 18.223134, 4.168473, 7.720186, 2.040815, 5.103356, 3.030302, 6.81818, 9.255087, 1207.349938, 3.333332, 1054.838288, 3089.493326, 3.773582, 5268.386, 1357.0515, 3528.900527, 378.504256, 213.952387, 988.430319, 1.81818, 23.115576, 22.110551, 4.166665, 155.33333, 92.431693, 4722.5643, 331.360006, 28.476882, 131.053375, 1147.787211, 18.888884, 19.148933, 1324.615592, 1136.428628, 1690.9, 940.052, 400.650709, 5059.193744, 3281.4894, 99.238092, 110.997367, 1244.615843, 1645.491, 1778.717966, 2144.25644, 1085.947, 1218.544183, 987.998, 1612.045212, 880.428447, 4894.435133, 36.919175, 39.108156, 71.504443, 1927.112871, 2.564101, 50.0, 2590.359414, 4651.271778, 2466.534073, 2132.567538, 3.571427, 4563.801049, 1602.312, 1430.256, 6.25, 10.0, 4286.036255, 7.061468, 267.641731, 4395.795, 21.739129, 32.53921, 16.764702, 4394.127, 1454.344327, 2930.914146, 2992.901, 1329.036, 2973.973, 4298.1774, 2.941175, 4245.40075, 4.01052, 4196.94, 8.333332, 3.3333319999999995, 3.703702, 1076.23475, 3114.581, 32.55, 11.11111, 4098.0297279999995, 4160.63, 19.205462, 1241.241, 2273.263262, 1833.7965, 4091.132, 8.0, 4060.610882, 12.5, 13.043477, 5.714284, 734.714175, 3242.758344, 3162.553, 3793.2042, 1509.18845, 2268.705, 2265.36167, 3731.796, 3.076922, 3721.60272, 3710.619207, 3679.26, 3672.77, 3667.494, 494.221533], "pnl": [0.02334150558, -0.014486318675000002, -0.02, 0.178574069688, 1.34689350735, 12.488192022045, -4.260272445499999, -2.262855374104, 7.294815094560022, 1.0476283125000094, 2.102013766747973, 10.937012721183919, 1.0425360075000043, 1.0537780437569992, 0.9468199928000001, -0.021190883086999998, 13.140188268977965, 3.443623332336, 19.959962434690055, 3.118843579999975, -3.6494157452679996, 2.164312, 0.7124803515679999, 1.038777650815, -1.438989206332, -0.6059446596979999, -2.93189219182, -2.426483652784, 29.360335792283877, -0.900095596668, 32.83922558201607, 43.50624501673201, -1.472194456418, 6.553872184000284, 8.052743600999975, 37.91803616261495, 27.50590428352001, 13.952690965817993, 1.4312471019120494, 0.8181809999999998, 0.11560099557599912, 0.11057486555100127, 3.125069406665, -14.28128036959, 56.431766937132, 21.572673722400395, 3.3606531808520117, 6.476924426490001, 1.0535380816249926, 22.78931507440484, -5.24475895818, 1.1489551289330002, 42.61685744141596, 4.429798791943995, 2.3875507999998717, 1.0528582399999777, 0.6510574021249909, 121.2031045250078, 42.2458996675999, -17.291139185524003, -23.73118509245, 3.616853639757892, 3.491731901999856, 28.71918027903598, 35.727600803279984, 3.861633892, 3.32662960259, 5.999123855999983, 10.047877806396173, 5.428721804202041, 103.52108740764123, 0.820417336275, -0.6249610381199999, -8.354886488905, 2.11404281948694, -0.052796385899, -0.45, 4.362165253176045, 64.28522724373761, -4.135554539753, 31.489109475476, -0.759195428573, 18.547287463135945, 2.063777855999888, 4.257872112000086, -1.0, -1.0, 87.67343988375458, -1.0905858946240001, 67.642165242554, 0.00022500000000000298, 0.28342110512900004, -5.999936700909999, -2.9999758896919997, 14.5489544214, 21.346865757905995, 52.167340170554, 19.0737572928, 4.6170701466, 2.9739727000000005, 57.341984647000004, -0.886396398825, 43.834909756950005, 0.200526, 12.38097205, -0.999991473268, -0.903695476668, -0.989315396298, 4.304938999999999, 6.5842237174000005, -0.9564814845, -0.99998839439, 7.032218222048001, 56.251717, 16.205491834552, 1.2412401, 3.264405300632, 14.0578834314, 27.836062126799998, 6.0, 100.14684566336601, -1.0, -2.999986207823, -1.999993214216, 99.714672397225, 80.472290786304, 5.2245375024, 17.5283963823, 40.78883621515, 3.4665808023999998, 2.36277125131, 7.9002120033, 1.0769250538400001, 14.566352939960002, 31.699819714800995, 6.7845553004, 5.832358060800001, 11.024486207799999, 21.22187205102]}};
+        const allPositionsData = [{"timestamp": "2026-05-06 15:10:34", "market": "KBO: Kia Tigers vs. Lotte Giants", "outcome": "Lotte Giants", "entry_price": 0.429999, "size": 2.32558, "exit_price": 0.0, "trades": 0, "pnl": 0.02334150558, "roi": 2.3341573867641676}, {"timestamp": "2026-05-06 15:10:13", "market": "KBO: KT Wiz vs. Kiwoom Heroes", "outcome": "KT Wiz", "entry_price": 0.552705, "size": 5.427835, "exit_price": 0.0, "trades": 0, "pnl": -0.014486318675000002, "roi": -0.4828786502929342}, {"timestamp": "2026-05-06 15:09:45", "market": "KBO: NC Dinos vs. SSG Landers", "outcome": "SSG Landers", "entry_price": 0.5, "size": 2.0, "exit_price": 0.0, "trades": 0, "pnl": -0.02, "roi": -2.0}, {"timestamp": "2026-05-06 15:08:04", "market": "KBO: Lotte Giants vs. KT Wiz", "outcome": "KT Wiz", "entry_price": 0.507364, "size": 7.883858, "exit_price": 0.0, "trades": 0, "pnl": 0.178574069688, "roi": 4.464367668483436}, {"timestamp": "2026-05-06 15:07:48", "market": "KBO: Kiwoom Heroes vs. Samsung Lions", "outcome": "Samsung Lions", "entry_price": 0.527818, "size": 9.472925, "exit_price": 0.0, "trades": 0, "pnl": 1.34689350735, "roi": 26.937976133658953}, {"timestamp": "2026-05-06 15:07:16", "market": "KBO: Doosan Bears vs. LG Twins", "outcome": "LG Twins", "entry_price": 0.449785, "size": 73.366963, "exit_price": 0.0, "trades": 0, "pnl": 12.488192022045, "roi": 37.84374069396283}, {"timestamp": "2026-05-06 11:09:44", "market": "KBO: Lotte Giants vs. KT Wiz", "outcome": "KT Wiz", "entry_price": 0.4795, "size": 12.214149, "exit_price": 0.0, "trades": 0, "pnl": -4.260272445499999, "roi": -72.74205201158466}, {"timestamp": "2026-05-06 06:44:14", "market": "Will the highest temperature in Tokyo be 23\u00b0C on May 6?", "outcome": "Yes", "entry_price": 0.024422, "size": 122.833332, "exit_price": 0.0, "trades": 0, "pnl": -2.262855374104, "roi": -75.43264532157863}, {"timestamp": "2026-05-06 06:44:02", "market": "Will the highest temperature in Tokyo be 22\u00b0C on May 6?", "outcome": "Yes", "entry_price": 0.99176, "size": 885.293094, "exit_price": 0.0, "trades": 0, "pnl": 7.294815094560022, "roi": 0.8308461724610818}, {"timestamp": "2026-05-06 05:50:30", "market": "Will the highest temperature in Tokyo be 23\u00b0C on May 6?", "outcome": "No", "entry_price": 0.987825, "size": 86.0475, "exit_price": 0.0, "trades": 0, "pnl": 1.0476283125000094, "roi": 1.2325057575987761}, {"timestamp": "2026-05-06 04:48:02", "market": "Will the highest temperature in Wellington be 18\u00b0C on May 6?", "outcome": "No", "entry_price": 0.997044, "size": 711.100733, "exit_price": 0.0, "trades": 0, "pnl": 2.102013766747973, "roi": 0.2964763841916668}, {"timestamp": "2026-05-06 04:46:26", "market": "Will the highest temperature in Wellington be 17\u00b0C on May 6?", "outcome": "Yes", "entry_price": 0.993696, "size": 1734.932221, "exit_price": 0.0, "trades": 0, "pnl": 10.937012721183919, "roi": 0.6343992528902151}, {"timestamp": "2026-05-06 03:42:40", "market": "Will the highest temperature in Tokyo be 24\u00b0C or higher on M", "outcome": "No", "entry_price": 0.987741, "size": 85.0425, "exit_price": 0.0, "trades": 0, "pnl": 1.0425360075000043, "roi": 1.2411148266600303}, {"timestamp": "2026-05-06 03:12:10", "market": "Will the highest temperature in Seoul be 20\u00b0C on May 6?", "outcome": "No", "entry_price": 0.929999, "size": 15.053757, "exit_price": 0.0, "trades": 0, "pnl": 1.0537780437569992, "roi": 7.52699734085735}, {"timestamp": "2026-05-06 03:12:00", "market": "Will the highest temperature in Seoul be 21\u00b0C or higher on M", "outcome": "Yes", "entry_price": 0.936654, "size": 14.9468, "exit_price": 0.0, "trades": 0, "pnl": 0.9468199928000001, "roi": 6.763009606535605}, {"timestamp": "2026-05-06 02:26:14", "market": "Will the highest temperature in Seoul be 20\u00b0C on May 6?", "outcome": "Yes", "entry_price": 0.343187, "size": 5.827701, "exit_price": 0.0, "trades": 0, "pnl": -0.021190883086999998, "roi": -1.0595488041338363}, {"timestamp": "2026-05-06 02:13:28", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 6?", "outcome": "No", "entry_price": 0.973354, "size": 493.139243, "exit_price": 0.0, "trades": 0, "pnl": 13.140188268977965, "roi": 2.737544613778741}, {"timestamp": "2026-05-06 01:23:00", "market": "KBO: Doosan Bears vs. LG Twins", "outcome": "LG Twins", "entry_price": 0.537372, "size": 7.443612, "exit_price": 0.0, "trades": 0, "pnl": 3.443623332336, "roi": 86.09082721094514}, {"timestamp": "2026-05-06 01:06:14", "market": "Will the highest temperature in Seoul be 18\u00b0C on May 6?", "outcome": "No", "entry_price": 0.97703, "size": 868.957877, "exit_price": 0.0, "trades": 0, "pnl": 19.959962434690055, "roi": 2.351002528069769}, {"timestamp": "2026-05-05 23:14:24", "market": "Will the highest temperature in Seoul be 17\u00b0C on May 6?", "outcome": "No", "entry_price": 0.99819, "size": 1723.118, "exit_price": 0.0, "trades": 0, "pnl": 3.118843579999975, "roi": 0.18132820404932784}, {"timestamp": "2026-05-05 09:05:52", "market": "KBO: NC Dinos vs. SSG Landers", "outcome": "NC Dinos", "entry_price": 0.658502, "size": 18.223134, "exit_price": 0.0, "trades": 0, "pnl": -3.6494157452679996, "roi": -30.411873437388003}, {"timestamp": "2026-05-05 08:44:30", "market": "KBO: Hanwha Eagles vs. Kia Tigers", "outcome": "Kia Tigers", "entry_price": 0.47979, "size": 4.168473, "exit_price": 0.0, "trades": 0, "pnl": 2.164312, "roi": 108.21605122468124}, {"timestamp": "2026-05-05 08:20:22", "market": "KBO: Lotte Giants vs. KT Wiz", "outcome": "KT Wiz", "entry_price": 0.906712, "size": 7.720186, "exit_price": 0.0, "trades": 0, "pnl": 0.7124803515679999, "roi": 10.17831212796157}, {"timestamp": "2026-05-05 08:05:40", "market": "KBO: Kiwoom Heroes vs. Samsung Lions", "outcome": "Samsung Lions", "entry_price": 0.489999, "size": 2.040815, "exit_price": 0.0, "trades": 0, "pnl": 1.038777650815, "roi": 103.87804459810057}, {"timestamp": "2026-05-05 08:04:14", "market": "KBO: Doosan Bears vs. LG Twins", "outcome": "Doosan Bears", "entry_price": 0.391897, "size": 5.103356, "exit_price": 0.0, "trades": 0, "pnl": -1.438989206332, "roi": -71.94982343541521}, {"timestamp": "2026-05-05 07:57:40", "market": "KBO: NC Dinos vs. SSG Landers", "outcome": "SSG Landers", "entry_price": 0.329999, "size": 3.030302, "exit_price": 0.0, "trades": 0, "pnl": -0.6059446596979999, "roi": -60.594670192138146}, {"timestamp": "2026-05-05 07:54:06", "market": "KBO: Hanwha Eagles vs. Kia Tigers", "outcome": "Hanwha Eagles", "entry_price": 0.439999, "size": 6.81818, "exit_price": 0.0, "trades": 0, "pnl": -2.93189219182, "roi": -97.72998790221308}, {"timestamp": "2026-05-05 07:53:58", "market": "KBO: Lotte Giants vs. KT Wiz", "outcome": "Lotte Giants", "entry_price": 0.270032, "size": 9.255087, "exit_price": 0.0, "trades": 0, "pnl": -2.426483652784, "roi": -97.0915940052717}, {"timestamp": "2026-05-05 06:57:20", "market": "Will the highest temperature in Seoul be 18\u00b0C on May 5?", "outcome": "Yes", "entry_price": 0.975682, "size": 1207.349938, "exit_price": 0.0, "trades": 0, "pnl": 29.360335792283877, "roi": 2.4924104370071287}, {"timestamp": "2026-05-05 06:50:30", "market": "KBO: Kiwoom Heroes vs. Samsung Lions", "outcome": "Kiwoom Heroes", "entry_price": 0.299999, "size": 3.333332, "exit_price": 0.0, "trades": 0, "pnl": -0.900095596668, "roi": -90.00989570362394}, {"timestamp": "2026-05-05 06:39:24", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 5?", "outcome": "No", "entry_price": 0.968868, "size": 1054.838288, "exit_price": 0.0, "trades": 0, "pnl": 32.83922558201607, "roi": 3.2132344137694786}, {"timestamp": "2026-05-05 06:33:42", "market": "Will the highest temperature in Seoul be 20\u00b0C or higher on M", "outcome": "No", "entry_price": 0.985918, "size": 3089.493326, "exit_price": 0.0, "trades": 0, "pnl": 43.50624501673201, "roi": 1.4283135108599299}, {"timestamp": "2026-05-05 05:56:32", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 5?", "outcome": "Yes", "entry_price": 0.529999, "size": 3.773582, "exit_price": 0.0, "trades": 0, "pnl": -1.472194456418, "roi": -73.60991838706869}, {"timestamp": "2026-05-04 21:16:58", "market": "Will the highest temperature in Seoul be 15\u00b0C on May 5?", "outcome": "No", "entry_price": 0.998756, "size": 5268.386, "exit_price": 0.0, "trades": 0, "pnl": 6.553872184000284, "roi": 0.12455494635326884}, {"timestamp": "2026-05-04 05:58:16", "market": "Will the highest temperature in Seoul be 18\u00b0C on May 4?", "outcome": "Yes", "entry_price": 0.994066, "size": 1357.0515, "exit_price": 0.0, "trades": 0, "pnl": 8.052743600999975, "roi": 0.5969422553432047}, {"timestamp": "2026-05-04 05:19:32", "market": "Will the highest temperature in Seoul be 20\u00b0C or higher on M", "outcome": "No", "entry_price": 0.989255, "size": 3528.900527, "exit_price": 0.0, "trades": 0, "pnl": 37.91803616261495, "roi": 1.0861709063891503}, {"timestamp": "2026-05-04 05:07:24", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 4?", "outcome": "No", "entry_price": 0.92733, "size": 378.504256, "exit_price": 0.0, "trades": 0, "pnl": 27.50590428352001, "roi": 7.836476766631084}, {"timestamp": "2026-05-04 01:41:34", "market": "Will the highest temperature in Seoul be 16\u00b0C on May 4?", "outcome": "No", "entry_price": 0.934786, "size": 213.952387, "exit_price": 0.0, "trades": 0, "pnl": 13.952690965817993, "roi": 6.976356085777918}, {"timestamp": "2026-05-04 01:02:38", "market": "Will the highest temperature in Seoul be 15\u00b0C on May 4?", "outcome": "No", "entry_price": 0.998552, "size": 988.430319, "exit_price": 0.0, "trades": 0, "pnl": 1.4312471019120494, "roi": 0.14500997444299846}, {"timestamp": "2026-05-03 20:45:06", "market": "KBO: Kiwoom Heroes vs. Samsung Lions", "outcome": "Samsung Lions", "entry_price": 0.55, "size": 1.81818, "exit_price": 0.0, "trades": 0, "pnl": 0.8181809999999998, "roi": 81.81818181818178}, {"timestamp": "2026-05-03 09:16:22", "market": "KBO: KT Wiz vs. Kia Tigers", "outcome": "KT Wiz", "entry_price": 0.994999, "size": 23.115576, "exit_price": 0.0, "trades": 0, "pnl": 0.11560099557599912, "roi": 0.502613570465896}, {"timestamp": "2026-05-03 09:16:14", "market": "KBO: Lotte Giants vs. SSG Landers", "outcome": "Lotte Giants", "entry_price": 0.994999, "size": 22.110551, "exit_price": 0.0, "trades": 0, "pnl": 0.11057486555100127, "roi": 0.5026135704659057}, {"timestamp": "2026-05-03 08:45:38", "market": "Bitcoin Up or Down - May 3, 4:40AM-4:45AM ET", "outcome": "Up", "entry_price": 0.239999, "size": 4.166665, "exit_price": 0.0, "trades": 0, "pnl": 3.125069406665, "roi": 312.5083677875254}, {"timestamp": "2026-05-03 05:18:56", "market": "Will the highest temperature in Seoul be 16\u00b0C on May 3?", "outcome": "Yes", "entry_price": 0.212123, "size": 155.33333, "exit_price": 0.0, "trades": 0, "pnl": -14.28128036959, "roi": -43.34257726306797}, {"timestamp": "2026-05-03 02:51:20", "market": "Will the highest temperature in Seoul be 15\u00b0C on May 3?", "outcome": "Yes", "entry_price": 0.389476, "size": 92.431693, "exit_price": 0.0, "trades": 0, "pnl": 56.431766937132, "roi": 156.75523010403722}, {"timestamp": "2026-05-03 02:23:48", "market": "Will the highest temperature in Seoul be 19\u00b0C or higher on M", "outcome": "No", "entry_price": 0.995432, "size": 4722.5643, "exit_price": 0.0, "trades": 0, "pnl": 21.572673722400395, "roi": 0.45889623801526214}, {"timestamp": "2026-05-03 02:13:12", "market": "Will the highest temperature in Seoul be 18\u00b0C on May 3?", "outcome": "No", "entry_price": 0.989858, "size": 331.360006, "exit_price": 0.0, "trades": 0, "pnl": 3.3606531808520117, "roi": 1.0245914060400618}, {"timestamp": "2026-05-03 00:21:56", "market": "Will the highest temperature in Seoul be 14\u00b0C on May 3?", "outcome": "No", "entry_price": 0.772555, "size": 28.476882, "exit_price": 0.0, "trades": 0, "pnl": 6.476924426490001, "roi": 29.440622350512268}, {"timestamp": "2026-05-02 21:24:00", "market": "Will the highest temperature in Wellington be 13\u00b0C on May 3?", "outcome": "No", "entry_price": 0.991961, "size": 131.053375, "exit_price": 0.0, "trades": 0, "pnl": 1.0535380816249926, "roi": 0.8104149255867866}, {"timestamp": "2026-05-02 05:47:12", "market": "Will the highest temperature in Seoul be 18\u00b0C on May 2?", "outcome": "Yes", "entry_price": 0.980145, "size": 1147.787211, "exit_price": 0.0, "trades": 0, "pnl": 22.78931507440484, "roi": 2.0257206841844684}, {"timestamp": "2026-05-02 05:12:30", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 2?", "outcome": "Yes", "entry_price": 0.317645, "size": 18.888884, "exit_price": 0.0, "trades": 0, "pnl": -5.24475895818, "roi": -87.4132384947428}, {"timestamp": "2026-05-02 05:09:30", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 2?", "outcome": "No", "entry_price": 0.939999, "size": 19.148933, "exit_price": 0.0, "trades": 0, "pnl": 1.1489551289330002, "roi": 6.383091896906275}, {"timestamp": "2026-05-02 03:22:58", "market": "Will the highest temperature in Seoul be 21\u00b0C or higher on M", "outcome": "No", "entry_price": 0.967827, "size": 1324.615592, "exit_price": 0.0, "trades": 0, "pnl": 42.61685744141596, "roi": 3.324251131658857}, {"timestamp": "2026-05-02 01:11:20", "market": "Will the highest temperature in Seoul be 16\u00b0C on May 2?", "outcome": "No", "entry_price": 0.996102, "size": 1136.428628, "exit_price": 0.0, "trades": 0, "pnl": 4.429798791943995, "roi": 0.3913253863560153}, {"timestamp": "2026-05-01 23:50:22", "market": "Will the highest temperature in Wellington be 19\u00b0C on May 2?", "outcome": "No", "entry_price": 0.998588, "size": 1690.9, "exit_price": 0.0, "trades": 0, "pnl": 2.3875507999998717, "roi": 0.14139965631470877}, {"timestamp": "2026-05-01 23:48:04", "market": "Will the highest temperature in Wellington be 20\u00b0C or higher", "outcome": "No", "entry_price": 0.99888, "size": 940.052, "exit_price": 0.0, "trades": 0, "pnl": 1.0528582399999777, "roi": 0.11212558065032599}, {"timestamp": "2026-05-01 23:35:04", "market": "Will the highest temperature in Seoul be 15\u00b0C on May 2?", "outcome": "No", "entry_price": 0.998375, "size": 400.650709, "exit_price": 0.0, "trades": 0, "pnl": 0.6510574021249909, "roi": 0.1627644922999852}, {"timestamp": "2026-05-01 06:39:08", "market": "Will the highest temperature in Seoul be 20\u00b0C or higher on M", "outcome": "No", "entry_price": 0.976043, "size": 5059.193744, "exit_price": 0.0, "trades": 0, "pnl": 121.2031045250078, "roi": 2.45450251679485}, {"timestamp": "2026-05-01 06:27:00", "market": "Will the highest temperature in Seoul be 17\u00b0C on May 1?", "outcome": "No", "entry_price": 0.986746, "size": 3281.4894, "exit_price": 0.0, "trades": 0, "pnl": 42.2458996675999, "roi": 1.3046925514695737}, {"timestamp": "2026-05-01 03:57:12", "market": "Will the highest temperature in Seoul be 19\u00b0C on May 1?", "outcome": "Yes", "entry_price": 0.413147, "size": 99.238092, "exit_price": 0.0, "trades": 0, "pnl": -17.291139185524003, "roi": -42.17359250313585}, {"timestamp": "2026-05-01 03:20:12", "market": "Will the highest temperature in Seoul be 20\u00b0C or higher on M", "outcome": "Yes", "entry_price": 0.34235, "size": 110.997367, "exit_price": 0.0, "trades": 0, "pnl": -23.73118509245, "roi": -62.45057157041792}, {"timestamp": "2026-04-30 22:35:52", "market": "Will the highest temperature in Wellington be 13\u00b0C on May 1?", "outcome": "No", "entry_price": 0.997094, "size": 1244.615843, "exit_price": 0.0, "trades": 0, "pnl": 3.616853639757892, "roi": 0.29144694482164296}, {"timestamp": "2026-04-30 22:33:06", "market": "Will the highest temperature in Seoul be 16\u00b0C on May 1?", "outcome": "No", "entry_price": 0.997878, "size": 1645.491, "exit_price": 0.0, "trades": 0, "pnl": 3.491731901999856, "roi": 0.21265124594388413}, {"timestamp": "2026-04-30 06:43:52", "market": "Will the highest temperature in Seoul be 19\u00b0C on April 30?", "outcome": "Yes", "entry_price": 0.983854, "size": 1778.717966, "exit_price": 0.0, "trades": 0, "pnl": 28.71918027903598, "roi": 1.641097154659125}, {"timestamp": "2026-04-30 06:41:00", "market": "Will the highest temperature in Seoul be 20\u00b0C or higher on A", "outcome": "No", "entry_price": 0.983338, "size": 2144.25644, "exit_price": 0.0, "trades": 0, "pnl": 35.727600803279984, "roi": 1.6944326365908764}, {"timestamp": "2026-04-30 06:34:58", "market": "Will the highest temperature in Wellington be 15\u00b0C on April ", "outcome": "Yes", "entry_price": 0.995444, "size": 1085.947, "exit_price": 0.0, "trades": 0, "pnl": 3.861633892, "roi": 0.3572281169648331}, {"timestamp": "2026-04-30 06:34:52", "market": "Will the highest temperature in Wellington be 17\u00b0C on April ", "outcome": "No", "entry_price": 0.99627, "size": 1218.544183, "exit_price": 0.0, "trades": 0, "pnl": 3.32662960259, "roi": 0.27402243053133785}, {"timestamp": "2026-04-30 01:30:14", "market": "Will the highest temperature in Tokyo be 19\u00b0C on April 30?", "outcome": "No", "entry_price": 0.993928, "size": 987.998, "exit_price": 0.0, "trades": 0, "pnl": 5.999123855999983, "roi": 0.6109094421326275}, {"timestamp": "2026-04-30 01:28:12", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 30?", "outcome": "No", "entry_price": 0.993767, "size": 1612.045212, "exit_price": 0.0, "trades": 0, "pnl": 10.047877806396173, "roi": 0.6272093961663154}, {"timestamp": "2026-04-29 22:57:48", "market": "Will the highest temperature in Seoul be 16\u00b0C on April 30?", "outcome": "No", "entry_price": 0.993834, "size": 880.428447, "exit_price": 0.0, "trades": 0, "pnl": 5.428721804202041, "roi": 0.620425543903715}, {"timestamp": "2026-04-29 07:12:36", "market": "Will the highest temperature in Seoul be 19\u00b0C or higher on A", "outcome": "No", "entry_price": 0.977123, "size": 4894.435133, "exit_price": 0.0, "trades": 0, "pnl": 103.52108740764123, "roi": 2.164596800336176}, {"timestamp": "2026-04-29 01:38:32", "market": "Will the highest temperature in Seoul be 18\u00b0C on April 29?", "outcome": "Yes", "entry_price": 0.297947, "size": 36.919175, "exit_price": 0.0, "trades": 0, "pnl": 0.820417336275, "roi": 7.458368282041395}, {"timestamp": "2026-04-29 01:35:56", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 29?", "outcome": "Yes", "entry_price": 0.28127, "size": 39.108156, "exit_price": 0.0, "trades": 0, "pnl": -0.6249610381199999, "roi": -5.6814892716723575}, {"timestamp": "2026-04-29 01:35:50", "market": "Will the highest temperature in Seoul be 16\u00b0C on April 29?", "outcome": "Yes", "entry_price": 0.153835, "size": 71.504443, "exit_price": 0.0, "trades": 0, "pnl": -8.354886488905, "roi": -75.95430077486375}, {"timestamp": "2026-04-29 01:13:00", "market": "Will the highest temperature in Seoul be 15\u00b0C on April 29?", "outcome": "No", "entry_price": 0.998903, "size": 1927.112871, "exit_price": 0.0, "trades": 0, "pnl": 2.11404281948694, "roi": 0.10982047305894255}, {"timestamp": "2026-04-29 00:28:58", "market": "Will the highest temperature in Seoul be 19\u00b0C or higher on A", "outcome": "Yes", "entry_price": 0.389999, "size": 2.564101, "exit_price": 0.0, "trades": 0, "pnl": -0.052796385899, "roi": -5.27965534805932}, {"timestamp": "2026-04-29 00:27:32", "market": "Will the highest temperature in Seoul be 15\u00b0C on April 29?", "outcome": "Yes", "entry_price": 0.02, "size": 50.0, "exit_price": 0.0, "trades": 0, "pnl": -0.45, "roi": -45.0}, {"timestamp": "2026-04-29 00:26:30", "market": "Will the highest temperature in Seoul be 14\u00b0C on April 29?", "outcome": "No", "entry_price": 0.998316, "size": 2590.359414, "exit_price": 0.0, "trades": 0, "pnl": 4.362165253176045, "roi": 0.1686840639637166}, {"timestamp": "2026-04-28 07:57:10", "market": "Will the highest temperature in Seoul be 15\u00b0C on April 28?", "outcome": "Yes", "entry_price": 0.986179, "size": 4651.271778, "exit_price": 0.0, "trades": 0, "pnl": 64.28522724373761, "roi": 1.4014697129020102}, {"timestamp": "2026-04-28 07:56:44", "market": "Will the highest temperature in Seoul be 19\u00b0C or higher on A", "outcome": "No", "entry_price": 0.998161, "size": 2466.534073, "exit_price": 0.0, "trades": 0, "pnl": -4.135554539753, "roi": -0.16797553627138603}, {"timestamp": "2026-04-28 07:55:18", "market": "Will the highest temperature in Seoul be 18\u00b0C on April 28?", "outcome": "No", "entry_price": 0.984198, "size": 2132.567538, "exit_price": 0.0, "trades": 0, "pnl": 31.489109475476, "roi": 1.5002896269305197}, {"timestamp": "2026-04-28 03:52:26", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 28?", "outcome": "Yes", "entry_price": 0.279999, "size": 3.571427, "exit_price": 0.0, "trades": 0, "pnl": -0.759195428573, "roi": -75.91984740422572}, {"timestamp": "2026-04-27 01:13:34", "market": "Will the highest temperature in Seoul be 23\u00b0C or higher on A", "outcome": "No", "entry_price": 0.995936, "size": 4563.801049, "exit_price": 0.0, "trades": 0, "pnl": 18.547287463135945, "roi": 0.4080583491308666}, {"timestamp": "2026-04-26 15:01:16", "market": "Will the highest temperature in Seoul be 13\u00b0C or below on Ap", "outcome": "No", "entry_price": 0.998712, "size": 1602.312, "exit_price": 0.0, "trades": 0, "pnl": 2.063777855999888, "roi": 0.12896610834754463}, {"timestamp": "2026-04-26 15:01:10", "market": "Will the highest temperature in Seoul be 14\u00b0C on April 27?", "outcome": "No", "entry_price": 0.997023, "size": 1430.256, "exit_price": 0.0, "trades": 0, "pnl": 4.257872112000086, "roi": 0.2985888991527839}, {"timestamp": "2026-04-25 05:37:58", "market": "Will the highest temperature in Seoul be 21\u00b0C or higher on A", "outcome": "No", "entry_price": 0.16, "size": 6.25, "exit_price": 0.0, "trades": 0, "pnl": -1.0, "roi": -100.0}, {"timestamp": "2026-04-25 05:37:54", "market": "Will the highest temperature in Seoul be 20\u00b0C on April 24?", "outcome": "Yes", "entry_price": 0.09999999999999999, "size": 10.0, "exit_price": 0.0, "trades": 0, "pnl": -1.0, "roi": -100.00000000000003}, {"timestamp": "2026-04-25 05:23:38", "market": "Will the highest temperature in Seoul be 20\u00b0C on April 25?", "outcome": "Yes", "entry_price": 0.979499, "size": 4286.036255, "exit_price": 0.0, "trades": 0, "pnl": 87.67343988375458, "roi": 2.08837367083781}, {"timestamp": "2026-04-25 04:09:14", "market": "Will the highest temperature in Seoul be 21\u00b0C or higher on A", "outcome": "Yes", "entry_price": 0.43616800000000006, "size": 7.061468, "exit_price": 0.0, "trades": 0, "pnl": -1.0905858946240001, "roi": -35.408789584568765}, {"timestamp": "2026-04-25 04:09:04", "market": "Will the highest temperature in Seoul be 21\u00b0C or higher on A", "outcome": "No", "entry_price": 0.747266, "size": 267.641731, "exit_price": 0.0, "trades": 0, "pnl": 67.642165242554, "roi": 33.82115605420292}, {"timestamp": "2026-04-25 03:19:16", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 25?", "outcome": "No", "entry_price": 0.999, "size": 4395.795, "exit_price": 0.0, "trades": 0, "pnl": 0.00022500000000000298, "roi": 5.123651699527121e-06}, {"timestamp": "2026-04-25 01:33:56", "market": "Will the highest temperature in Seoul be 19\u00b0C on April 25?", "outcome": "Yes", "entry_price": 0.045999, "size": 21.739129, "exit_price": 0.0, "trades": 0, "pnl": 0.28342110512900004, "roi": 28.34272852975181}, {"timestamp": "2026-04-24 05:36:26", "market": "Will the highest temperature in Seoul be 21\u00b0C on April 23?", "outcome": "Yes", "entry_price": 0.184391, "size": 32.53921, "exit_price": 0.0, "trades": 0, "pnl": -5.999936700909999, "roi": -99.99998716319955}, {"timestamp": "2026-04-24 05:35:58", "market": "Will the highest temperature in Seoul be 20\u00b0C on April 23?", "outcome": "Yes", "entry_price": 0.178946, "size": 16.764702, "exit_price": 0.0, "trades": 0, "pnl": -2.9999758896919997, "roi": -99.99998418654206}, {"timestamp": "2026-04-24 03:53:14", "market": "Will the highest temperature in Seoul be 18\u00b0C on April 24?", "outcome": "No", "entry_price": 0.996689, "size": 4394.127, "exit_price": 0.0, "trades": 0, "pnl": 14.5489544214, "roi": 0.3321999121887787}, {"timestamp": "2026-04-23 23:02:44", "market": "Will the highest temperature in Seoul be 22\u00b0C on April 23?", "outcome": "Yes", "entry_price": 0.985322, "size": 1454.344327, "exit_price": 0.0, "trades": 0, "pnl": 21.346865757905995, "roi": 1.489665288274946}, {"timestamp": "2026-04-23 23:02:44", "market": "Will the highest temperature in Seoul be 23\u00b0C or higher on A", "outcome": "No", "entry_price": 0.982201, "size": 2930.914146, "exit_price": 0.0, "trades": 0, "pnl": 52.167340170554, "roi": 1.8121545138271984}, {"timestamp": "2026-04-22 23:47:40", "market": "Will the highest temperature in Seoul be 18\u00b0C on April 22?", "outcome": "Yes", "entry_price": 0.993627, "size": 2992.901, "exit_price": 0.0, "trades": 0, "pnl": 19.0737572928, "roi": 0.6413875367030555}, {"timestamp": "2026-04-22 23:47:40", "market": "Will the highest temperature in Seoul be 19\u00b0C or higher on A", "outcome": "No", "entry_price": 0.996526, "size": 1329.036, "exit_price": 0.0, "trades": 0, "pnl": 4.6170701466, "roi": 0.3486110056059996}, {"timestamp": "2026-04-22 05:46:52", "market": "Will the highest temperature in Seoul be 12\u00b0C on April 22?", "outcome": "No", "entry_price": 0.999, "size": 2973.973, "exit_price": 0.0, "trades": 0, "pnl": 2.9739727000000005, "roi": 0.10010009000248658}, {"timestamp": "2026-04-21 23:23:14", "market": "Will the highest temperature in Seoul be 18\u00b0C or higher on A", "outcome": "No", "entry_price": 0.986659, "size": 4298.1774, "exit_price": 0.0, "trades": 0, "pnl": 57.341984647000004, "roi": 1.3521388837688328}, {"timestamp": "2026-04-21 05:38:20", "market": "Will the highest temperature in Seoul be 15\u00b0C on April 21?", "outcome": "Yes", "entry_price": 0.339999, "size": 2.941175, "exit_price": 0.0, "trades": 0, "pnl": -0.886396398825, "roi": -88.63994490806242}, {"timestamp": "2026-04-21 03:44:12", "market": "Will the highest temperature in Seoul be 12\u00b0C on April 21?", "outcome": "No", "entry_price": 0.989381, "size": 4245.40075, "exit_price": 0.0, "trades": 0, "pnl": 43.834909756950005, "roi": 1.0436091028470251}, {"timestamp": "2026-04-20 23:59:58", "market": "Will the highest temperature in Seoul be 15\u00b0C on April 20?", "outcome": "Yes", "entry_price": 0.95, "size": 4.01052, "exit_price": 0.0, "trades": 0, "pnl": 0.200526, "roi": 5.2631578947368425}, {"timestamp": "2026-04-20 23:59:58", "market": "Will the highest temperature in Seoul be 17\u00b0C or higher on A", "outcome": "No", "entry_price": 0.99705, "size": 4196.94, "exit_price": 0.0, "trades": 0, "pnl": 12.38097205, "roi": 0.2958728021307465}, {"timestamp": "2026-04-20 03:30:48", "market": "Will the highest temperature in Seoul be 21\u00b0C or higher on A", "outcome": "No", "entry_price": 0.119999, "size": 8.333332, "exit_price": 0.0, "trades": 0, "pnl": -0.999991473268, "roi": -99.99999665997163}, {"timestamp": "2026-04-20 03:30:48", "market": "Will the highest temperature in Seoul be 16\u00b0C on April 20?", "outcome": "Yes", "entry_price": 0.299999, "size": 3.3333319999999995, "exit_price": 0.0, "trades": 0, "pnl": -0.903695476668, "roi": -90.3698850475837}, {"timestamp": "2026-04-20 03:30:48", "market": "Will the highest temperature in Seoul be 17\u00b0C or higher on A", "outcome": "Yes", "entry_price": 0.269999, "size": 3.703702, "exit_price": 0.0, "trades": 0, "pnl": -0.989315396298, "roi": -98.93195155296456}, {"timestamp": "2026-04-19 05:05:14", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 19?", "outcome": "No", "entry_price": 0.996, "size": 1076.23475, "exit_price": 0.0, "trades": 0, "pnl": 4.304938999999999, "roi": 0.4016064257028112}, {"timestamp": "2026-04-19 03:25:50", "market": "Will the highest temperature in Seoul be 14\u00b0C or below on Ap", "outcome": "No", "entry_price": 0.997886, "size": 3114.581, "exit_price": 0.0, "trades": 0, "pnl": 6.5842237174000005, "roi": 0.2118478297255391}, {"timestamp": "2026-04-18 23:56:34", "market": "Will the highest temperature in Seoul be 19\u00b0C on April 18?", "outcome": "Yes", "entry_price": 0.029385, "size": 32.55, "exit_price": 0.0, "trades": 0, "pnl": -0.9564814845, "roi": -99.99997224202136}, {"timestamp": "2026-04-18 23:56:32", "market": "Will the highest temperature in Seoul be 20\u00b0C on April 18?", "outcome": "Yes", "entry_price": 0.089999, "size": 11.11111, "exit_price": 0.0, "trades": 0, "pnl": -0.99998839439, "roi": -99.99996054955773}, {"timestamp": "2026-04-18 05:04:12", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 18?", "outcome": "No", "entry_price": 0.998284, "size": 4098.0297279999995, "exit_price": 0.0, "trades": 0, "pnl": 7.032218222048001, "roi": 0.1718949524315336}, {"timestamp": "2026-04-17 23:22:46", "market": "Will the highest temperature in Seoul be 18\u00b0C or higher on A", "outcome": "No", "entry_price": 0.98648, "size": 4160.63, "exit_price": 0.0, "trades": 0, "pnl": 56.251717, "roi": 1.370529545027884}, {"timestamp": "2026-04-17 23:22:46", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 17?", "outcome": "Yes", "entry_price": 0.156204, "size": 19.205462, "exit_price": 0.0, "trades": 0, "pnl": 16.205491834552, "roi": 540.1884655126123}, {"timestamp": "2026-04-16 10:12:06", "market": "Will the highest temperature in Seoul be 24\u00b0C or higher on A", "outcome": "Yes", "entry_price": 0.999, "size": 1241.241, "exit_price": 0.0, "trades": 0, "pnl": 1.2412401, "roi": 0.10010002751944082}, {"timestamp": "2026-04-16 05:56:12", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 16?", "outcome": "No", "entry_price": 0.9985640000000001, "size": 2273.263262, "exit_price": 0.0, "trades": 0, "pnl": 3.264405300632, "roi": 0.14380647338509533}, {"timestamp": "2026-04-16 05:56:12", "market": "Will the highest temperature in Seoul be 18\u00b0C on April 16?", "outcome": "No", "entry_price": 0.992334, "size": 1833.7965, "exit_price": 0.0, "trades": 0, "pnl": 14.0578834314, "roi": 0.7725221252962914}, {"timestamp": "2026-04-15 03:34:30", "market": "Will the highest temperature in Seoul be 17\u00b0C on April 15?", "outcome": "No", "entry_price": 0.993196, "size": 4091.132, "exit_price": 0.0, "trades": 0, "pnl": 27.836062126799998, "roi": 0.6850611560766136}, {"timestamp": "2026-04-14 22:12:58", "market": "Will the highest temperature in Seoul be 23\u00b0C on April 14?", "outcome": "Yes", "entry_price": 0.25, "size": 8.0, "exit_price": 0.0, "trades": 0, "pnl": 6.0, "roi": 300.0}, {"timestamp": "2026-04-14 22:12:58", "market": "Will the highest temperature in Seoul be 24\u00b0C or higher on A", "outcome": "No", "entry_price": 0.975337, "size": 4060.610882, "exit_price": 0.0, "trades": 0, "pnl": 100.14684566336601, "roi": 2.5286644382493657}, {"timestamp": "2026-04-14 06:06:59", "market": "Will the highest temperature in Seoul be 20\u00b0C on April 14?", "outcome": "Yes", "entry_price": 0.08, "size": 12.5, "exit_price": 0.0, "trades": 0, "pnl": -1.0, "roi": -100.0}, {"timestamp": "2026-04-14 04:56:43", "market": "Will the highest temperature in Seoul be 21\u00b0C on April 14?", "outcome": "Yes", "entry_price": 0.229999, "size": 13.043477, "exit_price": 0.0, "trades": 0, "pnl": -2.999986207823, "roi": -99.99998470993204}, {"timestamp": "2026-04-14 04:56:41", "market": "Will the highest temperature in Seoul be 22\u00b0C on April 14?", "outcome": "Yes", "entry_price": 0.349999, "size": 5.714284, "exit_price": 0.0, "trades": 0, "pnl": -1.999993214216, "roi": -99.99997642492556}, {"timestamp": "2026-04-13 21:58:25", "market": "Will the highest temperature in Seoul be 23\u00b0C or higher on A", "outcome": "No", "entry_price": 0.864281, "size": 734.714175, "exit_price": 0.0, "trades": 0, "pnl": 99.714672397225, "roi": 15.703110333395218}, {"timestamp": "2026-04-13 21:58:25", "market": "Will the highest temperature in Seoul be 20\u00b0C on April 13?", "outcome": "Yes", "entry_price": 0.975184, "size": 3242.758344, "exit_price": 0.0, "trades": 0, "pnl": 80.472290786304, "roi": 2.544750520327155}, {"timestamp": "2026-04-13 06:06:29", "market": "Will the highest temperature in Seoul be 14\u00b0C on April 13?", "outcome": "No", "entry_price": 0.998348, "size": 3162.553, "exit_price": 0.0, "trades": 0, "pnl": 5.2245375024, "roi": 0.16547336029637635}, {"timestamp": "2026-04-12 23:08:21", "market": "Will the highest temperature in Seoul be 24\u00b0C or higher on A", "outcome": "No", "entry_price": 0.995379, "size": 3793.2042, "exit_price": 0.0, "trades": 0, "pnl": 17.5283963823, "roi": 0.46424527144395517}, {"timestamp": "2026-04-11 23:42:29", "market": "Will the highest temperature in Seoul be 17\u00b0C or higher on A", "outcome": "No", "entry_price": 0.972973, "size": 1509.18845, "exit_price": 0.0, "trades": 0, "pnl": 40.78883621515, "roi": 2.777774921273254}, {"timestamp": "2026-04-11 23:42:29", "market": "Will the highest temperature in Seoul be 13\u00b0C on April 11?", "outcome": "No", "entry_price": 0.9984720000000001, "size": 2268.705, "exit_price": 0.0, "trades": 0, "pnl": 3.4665808023999998, "roi": 0.1530338163828962}, {"timestamp": "2026-04-11 04:42:01", "market": "Will the highest temperature in Seoul be 10\u00b0C on April 11?", "outcome": "No", "entry_price": 0.998957, "size": 2265.36167, "exit_price": 0.0, "trades": 0, "pnl": 2.36277125131, "roi": 0.10440885559554478}, {"timestamp": "2026-04-11 01:20:21", "market": "Will the highest temperature in Seoul be 12\u00b0C on April 10?", "outcome": "Yes", "entry_price": 0.997883, "size": 3731.796, "exit_price": 0.0, "trades": 0, "pnl": 7.9002120033, "roi": 0.212149116230318}, {"timestamp": "2026-04-09 23:00:11", "market": "Will the highest temperature in Seoul be 12\u00b0C on April 9?", "outcome": "Yes", "entry_price": 0.649999, "size": 3.076922, "exit_price": 0.0, "trades": 0, "pnl": 1.0769250538400001, "roi": 53.84635437874024}, {"timestamp": "2026-04-09 23:00:11", "market": "Will the highest temperature in Seoul be 15\u00b0C or higher on A", "outcome": "No", "entry_price": 0.996086, "size": 3721.60272, "exit_price": 0.0, "trades": 0, "pnl": 14.566352939960002, "roi": 0.3929379563095359}, {"timestamp": "2026-04-08 23:15:45", "market": "Will the highest temperature in Seoul be 15\u00b0C or higher on A", "outcome": "No", "entry_price": 0.991457, "size": 3710.619207, "exit_price": 0.0, "trades": 0, "pnl": 31.699819714800995, "roi": 0.861661166749929}, {"timestamp": "2026-04-08 03:52:47", "market": "Will the highest temperature in Seoul be 8\u00b0C on April 8?", "outcome": "No", "entry_price": 0.998156, "size": 3679.26, "exit_price": 0.0, "trades": 0, "pnl": 6.7845553004, "roi": 0.18474065797907216}, {"timestamp": "2026-04-07 21:51:33", "market": "Will the highest temperature in Seoul be 11\u00b0C on April 7?", "outcome": "Yes", "entry_price": 0.998412, "size": 3672.77, "exit_price": 0.0, "trades": 0, "pnl": 5.832358060800001, "roi": 0.15905255642219618}, {"timestamp": "2026-04-07 07:43:37", "market": "Will the highest temperature in Seoul be 8\u00b0C on April 7?", "outcome": "No", "entry_price": 0.996994, "size": 3667.494, "exit_price": 0.0, "trades": 0, "pnl": 11.024486207799999, "roi": 0.30150630734088263}, {"timestamp": "2026-04-06 22:30:05", "market": "Will the highest temperature in London be 15\u00b0C on April 6?", "outcome": "No", "entry_price": 0.95706, "size": 494.221533, "exit_price": 0.0, "trades": 0, "pnl": 21.22187205102, "roi": 4.4866569321182315}];
+
+        let currentPage = 1;
+        const rowsPerPage = 50;
+        let filteredData = allPositionsData;
+
+        // Global Plotly layout configuration for dark theme
+        const darkLayout = {
+            paper_bgcolor: 'rgba(0, 0, 0, 0)',
+            plot_bgcolor: 'rgba(255, 255, 255, 0.02)',
+            font: {
+                color: '#E5E7EB',
+                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif'
+            },
+            xaxis: {
+                gridcolor: 'rgba(124, 58, 237, 0.1)',
+                zerolinecolor: 'rgba(124, 58, 237, 0.2)',
+                color: '#9CA3AF'
+            },
+            yaxis: {
+                gridcolor: 'rgba(124, 58, 237, 0.1)',
+                zerolinecolor: 'rgba(124, 58, 237, 0.2)',
+                color: '#9CA3AF'
+            },
+            hoverlabel: {
+                bgcolor: 'rgba(15, 10, 30, 0.9)',
+                bordercolor: 'rgba(124, 58, 237, 0.5)',
+                font: {color: '#E5E7EB'}
+            }
+        };
+
+        const plotConfig = {
+            responsive: true,
+            displayModeBar: false
+        };
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Initialize charts when Charts tab is opened
+            if (tabName === 'charts') {
+                initializeCharts();
+            } else if (tabName === 'overview') {
+                initializeOverviewCharts();
+            }
+        }
+
+        // Initialize overview charts (smaller versions)
+        function initializeOverviewCharts() {
+            if (!chartData.cumulative_pnl) return;
+
+            // Mini Cumulative PnL
+            const cumulativePnlMini = {
+                x: chartData.cumulative_pnl.timestamps,
+                y: chartData.cumulative_pnl.values,
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#7C3AED', width: 2},
+                fill: 'tozeroy',
+                fillcolor: 'rgba(124, 58, 237, 0.1)'
+            };
+
+            Plotly.newPlot('cumulative-pnl-mini', [cumulativePnlMini], {
+                ...darkLayout,
+                margin: {t: 10, r: 10, b: 40, l: 60},
+                height: 300,
+                xaxis: {...darkLayout.xaxis, title: 'Date'},
+                yaxis: {...darkLayout.yaxis, title: 'Cumulative PnL ($)'},
+                hovermode: 'x unified'
+            }, plotConfig);
+
+            // Mini Win/Loss Pie
+            const winLossPieMini = {
+                values: chartData.win_loss.values,
+                labels: chartData.win_loss.labels,
+                type: 'pie',
+                marker: {colors: ['#10B981', '#EF4444', '#F97316']},
+                textinfo: 'label+percent',
+                hole: 0.4
+            };
+
+            Plotly.newPlot('win-loss-pie-mini', [winLossPieMini], {
+                ...darkLayout,
+                margin: {t: 10, r: 10, b: 10, l: 10},
+                height: 300,
+                showlegend: true
+            }, plotConfig);
+        }
+
+        // Initialize all charts
+        function initializeCharts() {
+            if (!chartData.cumulative_pnl) return;
+
+            // 1. Cumulative PnL
+            const cumulativePnl = {
+                x: chartData.cumulative_pnl.timestamps,
+                y: chartData.cumulative_pnl.values,
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#7C3AED', width: 3},
+                fill: 'tozeroy',
+                fillcolor: 'rgba(124, 58, 237, 0.1)',
+                name: 'Cumulative PnL'
+            };
+
+            Plotly.newPlot('cumulative-pnl', [cumulativePnl], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Date', showgrid: true},
+                yaxis: {...darkLayout.yaxis, title: 'Cumulative PnL ($)', showgrid: true},
+                hovermode: 'x unified'
+            }, plotConfig);
+
+            // 2. Win/Loss Pie
+            const winLossPie = {
+                values: chartData.win_loss.values,
+                labels: chartData.win_loss.labels,
+                type: 'pie',
+                marker: {colors: ['#10B981', '#EF4444', '#F97316']},
+                textinfo: 'label+percent',
+                hole: 0.4
+            };
+
+            Plotly.newPlot('win-loss-pie', [winLossPie], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 20, l: 20},
+                height: 400,
+                showlegend: true
+            }, plotConfig);
+
+            // 3. PnL Histogram
+            const pnlHist = {
+                x: chartData.pnl_distribution,
+                type: 'histogram',
+                marker: {color: '#F97316'},
+                nbinsx: 30
+            };
+
+            Plotly.newPlot('pnl-histogram', [pnlHist], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Realized PnL ($)'},
+                yaxis: {...darkLayout.yaxis, title: 'Frequency'},
+                shapes: [{
+                    type: 'line',
+                    x0: 0, x1: 0,
+                    y0: 0, y1: 1,
+                    yref: 'paper',
+                    line: {color: '#EF4444', width: 2, dash: 'dash'}
+                }]
+            }, plotConfig);
+
+            // 4. Outcome Bar Chart
+            const outcomeBar = {
+                x: chartData.outcome_pnl.outcomes,
+                y: chartData.outcome_pnl.values,
+                type: 'bar',
+                marker: {color: chartData.outcome_pnl.values.map(v => v >= 0 ? '#10B981' : '#EF4444')}
+            };
+
+            Plotly.newPlot('outcome-bar', [outcomeBar], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Outcome'},
+                yaxis: {...darkLayout.yaxis, title: 'Total PnL ($)'}
+            }, plotConfig);
+
+            // 5. Hourly PnL
+            const hourlyBar = {
+                x: chartData.hourly_pnl.hours,
+                y: chartData.hourly_pnl.values,
+                type: 'bar',
+                marker: {color: '#7C3AED'}
+            };
+
+            Plotly.newPlot('hourly-bar', [hourlyBar], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Hour (UTC)', tickmode: 'linear'},
+                yaxis: {...darkLayout.yaxis, title: 'Total PnL ($)'},
+                shapes: [{
+                    type: 'line',
+                    x0: -0.5, x1: 23.5,
+                    y0: 0, y1: 0,
+                    line: {color: '#EF4444', width: 1, dash: 'dash'}
+                }]
+            }, plotConfig);
+
+            // 6. Position Size Distribution
+            const positionSizeHist = {
+                x: chartData.position_sizes,
+                type: 'histogram',
+                marker: {color: '#7C3AED'},
+                nbinsx: 25
+            };
+
+            Plotly.newPlot('position-size-hist', [positionSizeHist], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Position Size (shares)'},
+                yaxis: {...darkLayout.yaxis, title: 'Frequency'}
+            }, plotConfig);
+
+            // 7. ROI Distribution
+            const roiHist = {
+                x: chartData.roi_distribution,
+                type: 'histogram',
+                marker: {color: '#F97316'},
+                nbinsx: 30
+            };
+
+            Plotly.newPlot('roi-histogram', [roiHist], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'ROI (%)'},
+                yaxis: {...darkLayout.yaxis, title: 'Frequency'},
+                shapes: [{
+                    type: 'line',
+                    x0: 0, x1: 0,
+                    y0: 0, y1: 1,
+                    yref: 'paper',
+                    line: {color: '#E5E7EB', width: 2}
+                }]
+            }, plotConfig);
+
+            // 8. Drawdown Chart
+            const drawdownTrace = {
+                x: Array.from({length: chartData.drawdown.length}, (_, i) => i),
+                y: chartData.drawdown,
+                type: 'scatter',
+                mode: 'lines',
+                fill: 'tozeroy',
+                fillcolor: 'rgba(239, 68, 68, 0.3)',
+                line: {color: '#EF4444', width: 2}
+            };
+
+            Plotly.newPlot('drawdown-chart', [drawdownTrace], {
+                ...darkLayout,
+                margin: {t: 20, r: 20, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Position Number'},
+                yaxis: {...darkLayout.yaxis, title: 'Drawdown ($)'}
+            }, plotConfig);
+
+            // 9. Entry Price vs PnL Scatter
+            const entryPnlScatter = {
+                x: chartData.entry_vs_pnl.entry_prices,
+                y: chartData.entry_vs_pnl.pnl,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 8,
+                    color: chartData.entry_vs_pnl.pnl,
+                    colorscale: [[0, '#EF4444'], [0.5, '#F59E0B'], [1, '#10B981']],
+                    showscale: true,
+                    colorbar: {title: 'PnL ($)', tickfont: {color: '#E5E7EB'}, titlefont: {color: '#E5E7EB'}}
+                }
+            };
+
+            Plotly.newPlot('entry-pnl-scatter', [entryPnlScatter], {
+                ...darkLayout,
+                margin: {t: 20, r: 80, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Average Entry Price ($)'},
+                yaxis: {...darkLayout.yaxis, title: 'Realized PnL ($)'},
+                shapes: [{
+                    type: 'line',
+                    x0: 0, x1: 1,
+                    xref: 'paper',
+                    y0: 0, y1: 0,
+                    line: {color: '#EF4444', width: 1, dash: 'dash'}
+                }]
+            }, plotConfig);
+
+            // 10. Position Size vs PnL Scatter
+            const sizePnlScatter = {
+                x: chartData.size_vs_pnl.sizes,
+                y: chartData.size_vs_pnl.pnl,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 8,
+                    color: chartData.size_vs_pnl.pnl,
+                    colorscale: [[0, '#EF4444'], [0.5, '#F59E0B'], [1, '#10B981']],
+                    showscale: true,
+                    colorbar: {title: 'PnL ($)', tickfont: {color: '#E5E7EB'}, titlefont: {color: '#E5E7EB'}}
+                }
+            };
+
+            Plotly.newPlot('size-pnl-scatter', [sizePnlScatter], {
+                ...darkLayout,
+                margin: {t: 20, r: 80, b: 60, l: 70},
+                height: 400,
+                xaxis: {...darkLayout.xaxis, title: 'Position Size (shares)'},
+                yaxis: {...darkLayout.yaxis, title: 'Realized PnL ($)'},
+                shapes: [{
+                    type: 'line',
+                    x0: 0, x1: 1,
+                    xref: 'paper',
+                    y0: 0, y1: 0,
+                    line: {color: '#EF4444', width: 1, dash: 'dash'}
+                }]
+            }, plotConfig);
+        }
+
+        // Table filtering
+        function filterPositions() {
+            const searchTerm = document.getElementById('search-positions').value.toLowerCase();
+            filteredData = allPositionsData.filter(row => {
+                return Object.values(row).some(val =>
+                    String(val).toLowerCase().includes(searchTerm)
+                );
+            });
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+        }
+
+        // Render table with pagination
+        function renderTable() {
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            const tbody = document.getElementById('positions-tbody');
+            tbody.innerHTML = pageData.map(row => `
+                <tr>
+                    <td>${row.timestamp}</td>
+                    <td>${row.market}</td>
+                    <td>${row.outcome}</td>
+                    <td>$${row.entry_price}</td>
+                    <td>${row.size}</td>
+                    <td>$${row.exit_price}</td>
+                    <td>${row.trades}</td>
+                    <td class="${row.pnl >= 0 ? 'positive-value' : 'negative-value'}">$${row.pnl.toFixed(2)}</td>
+                    <td class="${row.roi >= 0 ? 'positive-value' : 'negative-value'}">${row.roi.toFixed(2)}%</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render pagination controls
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            const pagination = document.getElementById('pagination');
+
+            let html = '';
+            html += `<button onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>First</button>`;
+            html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+
+            // Show page numbers (with ellipsis for large page counts)
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                html += `<button onclick="changePage(1)">1</button>`;
+                if (startPage > 2) html += `<span style="padding: 8px;">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span style="padding: 8px;">...</span>`;
+                html += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+            html += `<button onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>Last</button>`;
+
+            pagination.innerHTML = html;
+        }
+
+        // Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+            renderPagination();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeOverviewCharts();
+            renderTable();
+            renderPagination();
+        });
+    </script>
+</body>
+</html>
