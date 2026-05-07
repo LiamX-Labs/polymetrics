@@ -65,3 +65,36 @@ htmlcov/
 tmp/
 temp/
 *.tmp
+
+# Data files
+data/
+*.csv
+
+# Reports and outputs
+reports/
+*.pdf
+*.html
+
+# Jupyter notebooks
+*.ipynb
+.jupyter/
+.virtual_documents/
+
+# Documentation artifacts (keep README.md)
+CHANGELOG*.md
+*_README.md
+*_SUMMARY.md
+FIXED_ISSUES.md
+PLATFORM_*.md
+PROJECT_STRUCTURE.txt
+QUICKSTART*.md
+START_HERE.md
+SUMMARY.txt
+TRACKER_*.md
+UX_IMPROVEMENTS.md
+WEBSOCKET_*.md
+INSTALL_DEPENDENCIES.sh
+RUN_PLATFORM.sh
+
+# Legacy/backup files
+*.backup
