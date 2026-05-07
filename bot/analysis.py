@@ -51,9 +51,12 @@ def run_wallet_analysis(wallet_address: str, days_back: int = None) -> dict:
     df['Timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
     df['Realized PnL'] = df['realizedPnl'].astype(float)
     df['Avg Price'] = df['avgPrice'].astype(float)
-    df['Total Bought'] = df['totalBought'].astype(float)
+    df['Total Bought'] = df['totalBought'].astype(float)  # Number of shares
     df['Market Title'] = df['title']
     df['Outcome'] = df['outcome']
+
+    # Calculate position size in dollars (investment amount)
+    df['Position Size ($)'] = df['Total Bought'] * df['Avg Price']
 
     # Calculate comprehensive metrics
     metrics = calculate_metrics(df, trades)
@@ -138,9 +141,9 @@ def calculate_metrics(df: pd.DataFrame, trades: list) -> dict:
     else:
         trading_style = "📊 Normal Trader"
 
-    # Position sizing
-    avg_position_size = df['Total Bought'].mean()
-    median_position_size = df['Total Bought'].median()
+    # Position sizing - calculate from dollar investment amounts
+    avg_position_size = df['Position Size ($)'].mean()
+    median_position_size = df['Position Size ($)'].median()
 
     return {
         'trading_style': trading_style,
@@ -330,15 +333,15 @@ def generate_html_report(analysis_results: dict) -> str:
             'values': [df_sorted[df_sorted['Timestamp'].dt.hour == h]['Realized PnL'].sum()
                        for h in range(24)]
         },
-        'position_sizes': df['Total Bought'].tolist(),
-        'roi_distribution': (df['Realized PnL'] / (df['Avg Price'] * df['Total Bought']) * 100).tolist(),
+        'position_sizes': df['Position Size ($)'].tolist(),
+        'roi_distribution': (df['Realized PnL'] / df['Position Size ($)'] * 100).tolist(),
         'drawdown': drawdown,
         'entry_vs_pnl': {
             'entry_prices': df['Avg Price'].tolist(),
             'pnl': df['Realized PnL'].tolist()
         },
         'size_vs_pnl': {
-            'sizes': df['Total Bought'].tolist(),
+            'sizes': df['Position Size ($)'].tolist(),
             'pnl': df['Realized PnL'].tolist()
         }
     }
@@ -462,13 +465,13 @@ def generate_html_report(analysis_results: dict) -> str:
     # All positions data for JavaScript
     all_positions_data = []
     for _, row in df.iterrows():
-        roi = (row['Realized PnL'] / (row['Avg Price'] * row['Total Bought']) * 100) if (row['Avg Price'] * row['Total Bought']) != 0 else 0
+        roi = (row['Realized PnL'] / row['Position Size ($)'] * 100) if row['Position Size ($)'] != 0 else 0
         all_positions_data.append({
             'timestamp': row['Timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
             'market': row['Market Title'][:60],
             'outcome': row['Outcome'],
             'entry_price': float(row['Avg Price']),
-            'size': float(row['Total Bought']),
+            'size': float(row['Position Size ($)']),  # Dollar amount invested
             'exit_price': 0.0,  # Not available in current data
             'trades': 0,  # Not available
             'pnl': float(row['Realized PnL']),
