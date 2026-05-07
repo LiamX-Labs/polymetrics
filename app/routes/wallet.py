@@ -287,7 +287,7 @@ def view_wallet(address):
                 'timestamp': p.close_timestamp,
                 'realized_pnl': p.realized_pnl,  # Use underscore, not camelCase
                 'avg_price': p.avg_entry_price,
-                'total_bought': p.position_size,
+                'position_size_dollars': p.position_size,  # Already stored as dollars
                 'outcome': p.outcome,
                 'transactions': p.num_trades,
                 'roi': p.roi or 0,
