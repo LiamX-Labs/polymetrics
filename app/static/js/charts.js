@@ -218,7 +218,7 @@ function initializeCharts() {
         ...darkLayout,
         margin: {t: 20, r: 20, b: 60, l: 70},
         height: 400,
-        xaxis: {...darkLayout.xaxis, title: 'Position Size (shares)'},
+        xaxis: {...darkLayout.xaxis, title: 'Position Size ($)'},
         yaxis: {...darkLayout.yaxis, title: 'Frequency'}
     }, plotConfig);
 
@@ -313,7 +313,7 @@ function initializeCharts() {
         ...darkLayout,
         margin: {t: 20, r: 80, b: 60, l: 70},
         height: 400,
-        xaxis: {...darkLayout.xaxis, title: 'Position Size (shares)'},
+        xaxis: {...darkLayout.xaxis, title: 'Position Size ($)'},
         yaxis: {...darkLayout.yaxis, title: 'Realized PnL ($)'},
         shapes: [{
             type: 'line',
@@ -362,9 +362,7 @@ function renderTable() {
             <td>${row.market}</td>
             <td>${row.outcome}</td>
             <td>$${row.entry_price}</td>
-            <td>${row.size}</td>
-            <td>$${row.exit_price}</td>
-            <td>${row.trades}</td>
+            <td>$${row.size.toFixed(2)}</td>
             <td class="${row.pnl >= 0 ? 'positive-value' : 'negative-value'}">$${row.pnl.toFixed(2)}</td>
             <td class="${row.roi >= 0 ? 'positive-value' : 'negative-value'}">${row.roi.toFixed(2)}%</td>
         </tr>

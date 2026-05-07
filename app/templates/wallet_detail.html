@@ -336,9 +336,9 @@ function filterDataByTimeRange(range, tab) {
                     <th>Market</th>
                     <th>Outcome</th>
                     <th>PnL</th>
+                    <th>ROI</th>
                     <th>Entry Price</th>
-                    <th>Size</th>
-                    <th>Trades</th>
+                    <th>Size ($)</th>
                     <th>Timestamp</th>
                 </tr>
             </thead>
@@ -348,9 +348,9 @@ function filterDataByTimeRange(range, tab) {
                     <td>{{ pos.short_market_title }}</td>
                     <td>{{ pos.outcome }}</td>
                     <td class="positive-value">${{ "{:,.2f}".format(pos.realized_pnl) }}</td>
+                    <td class="positive-value">{{ "{:,.2f}".format(pos.roi) }}%</td>
                     <td>${{ "{:.4f}".format(pos.avg_entry_price) }}</td>
-                    <td>{{ "{:,.0f}".format(pos.position_size) }}</td>
-                    <td>{{ pos.num_trades }}</td>
+                    <td>${{ "{:,.2f}".format(pos.position_size) }}</td>
                     <td>{{ pos.close_timestamp.strftime('%Y-%m-%d %H:%M') if pos.close_timestamp else 'N/A' }}</td>
                 </tr>
                 {% endfor %}
@@ -366,9 +366,9 @@ function filterDataByTimeRange(range, tab) {
                     <th>Market</th>
                     <th>Outcome</th>
                     <th>PnL</th>
+                    <th>ROI</th>
                     <th>Entry Price</th>
-                    <th>Size</th>
-                    <th>Trades</th>
+                    <th>Size ($)</th>
                     <th>Timestamp</th>
                 </tr>
             </thead>
@@ -378,9 +378,9 @@ function filterDataByTimeRange(range, tab) {
                     <td>{{ pos.short_market_title }}</td>
                     <td>{{ pos.outcome }}</td>
                     <td class="negative-value">${{ "{:,.2f}".format(pos.realized_pnl) }}</td>
+                    <td class="negative-value">{{ "{:,.2f}".format(pos.roi) }}%</td>
                     <td>${{ "{:.4f}".format(pos.avg_entry_price) }}</td>
-                    <td>{{ "{:,.0f}".format(pos.position_size) }}</td>
-                    <td>{{ pos.num_trades }}</td>
+                    <td>${{ "{:,.2f}".format(pos.position_size) }}</td>
                     <td>{{ pos.close_timestamp.strftime('%Y-%m-%d %H:%M') if pos.close_timestamp else 'N/A' }}</td>
                 </tr>
                 {% endfor %}
@@ -401,9 +401,7 @@ function filterDataByTimeRange(range, tab) {
                     <th>Market</th>
                     <th>Side</th>
                     <th>Entry Price</th>
-                    <th>Size</th>
-                    <th>Exit Price</th>
-                    <th>Trades</th>
+                    <th>Size ($)</th>
                     <th>PnL ($)</th>
                     <th>ROI (%)</th>
                 </tr>

@@ -41,7 +41,13 @@ class WalletAnalyzer:
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
         df['realized_pnl'] = df['realizedPnl'].astype(float)
         df['avg_price'] = df['avgPrice'].astype(float)
-        df['total_bought'] = df['totalBought'].astype(float)
+        df['total_bought'] = df['totalBought'].astype(float)  # This is the actual $ amount invested
+
+        # Calculate exit price from PnL and investment
+        # Formula: realizedPnl = totalBought * (exitPrice - avgPrice)
+        # Therefore: exitPrice = (realizedPnl / totalBought) + avgPrice
+        df['exit_price'] = (df['realized_pnl'] / df['total_bought']) + df['avg_price']
+        df['exit_price'] = df['exit_price'].fillna(0)
 
         # Calculate basic metrics
         total_pnl = df['realized_pnl'].sum()
@@ -70,7 +76,7 @@ class WalletAnalyzer:
         best_trade = df['realized_pnl'].max()
         worst_trade = df['realized_pnl'].min()
 
-        # Position sizing
+        # Position sizing - total_bought is already the $ amount invested
         avg_position_size = df['total_bought'].mean()
         median_position_size = df['total_bought'].median()
         total_volume = df['total_bought'].sum()
@@ -85,8 +91,9 @@ class WalletAnalyzer:
         df_sorted = df.sort_values('timestamp')
         holding_times = self._calculate_holding_times(df_sorted)
 
-        # Calculate ROI for each position
-        df['roi'] = (df['realized_pnl'] / (df['avg_price'] * df['total_bought']) * 100).fillna(0)
+        # Calculate ROI for each position: (PnL / amount invested) * 100
+        # ROI = (realizedPnl / totalBought) * 100
+        df['roi'] = (df['realized_pnl'] / df['total_bought'] * 100).fillna(0)
 
         # Prepare position list for database storage
         positions_list = []
@@ -171,23 +178,78 @@ class WalletAnalyzer:
         }
 
     def _classify_trading_style(self, df: pd.DataFrame) -> str:
-        """Classify trading style based on activity patterns"""
+        """
+        Classify trading style based on comprehensive activity patterns
+
+        Categories:
+        - HFT (High-Frequency Trader): Very fast trading with high win rate
+        - Scalper: Quick trades (< 1 day) with consistent small profits
+        - Day Trader: Intraday positions (< 3 days) with moderate frequency
+        - Swing Trader: Medium-term positions (3-14 days) with good risk/reward
+        - Position Trader: Long-term positions (> 14 days) with low frequency
+        """
         num_positions = len(df)
 
         if num_positions == 0:
             return 'unknown'
 
-        # Calculate time span
+        # Calculate time span and frequency
         time_span_hours = (df['timestamp'].max() - df['timestamp'].min()).total_seconds() / 3600
 
-        if time_span_hours > 0:
-            positions_per_hour = num_positions / time_span_hours
+        if time_span_hours <= 0:
+            return 'unknown'
 
-            if positions_per_hour >= self.HFT_THRESHOLD_TRADES_PER_HOUR:
-                return 'hft'
-            elif num_positions >= self.ACTIVE_TRADER_THRESHOLD:
-                return 'active'
+        positions_per_hour = num_positions / time_span_hours
 
+        # Calculate average position duration (if we have position-level timestamps)
+        # For now, use time between positions as a proxy
+        df_sorted = df.sort_values('timestamp')
+        time_diffs = df_sorted['timestamp'].diff()
+        avg_time_between_positions = time_diffs.dt.total_seconds().mean() / 3600  # in hours
+
+        # Calculate win rate
+        win_rate = (len(df[df['realized_pnl'] > 0]) / num_positions * 100) if num_positions > 0 else 0
+
+        # Calculate average ROI
+        avg_roi = df['roi'].mean() if 'roi' in df.columns else 0
+
+        # Calculate risk/reward from wins and losses
+        winning_pnl = df[df['realized_pnl'] > 0]['realized_pnl']
+        losing_pnl = df[df['realized_pnl'] < 0]['realized_pnl']
+
+        avg_win = winning_pnl.mean() if len(winning_pnl) > 0 else 0
+        avg_loss = abs(losing_pnl.mean()) if len(losing_pnl) > 0 else 0
+        risk_reward = avg_win / avg_loss if avg_loss > 0 else 0
+
+        # Classification logic with multiple factors
+
+        # HFT: Very high frequency (>10 positions/hour OR >200 positions with <1 hour between trades)
+        if positions_per_hour >= self.HFT_THRESHOLD_TRADES_PER_HOUR:
+            return 'hft'
+        if num_positions >= 200 and avg_time_between_positions < 1:
+            return 'hft'
+
+        # Scalper: Quick exits (<24 hours between trades), high volume, win rate >55%
+        if avg_time_between_positions < 24 and num_positions >= 50 and win_rate > 55:
+            return 'scalper'
+
+        # Day Trader: Fast trading (<72 hours between trades), moderate frequency
+        if avg_time_between_positions < 72 and num_positions >= 20:
+            return 'day_trader'
+
+        # Swing Trader: Medium-term (3-14 days), good risk/reward (>1.2), moderate activity
+        if 72 <= avg_time_between_positions <= 336 and risk_reward > 1.2 and num_positions >= 10:
+            return 'swing_trader'
+
+        # Position Trader: Long-term holds (>14 days), lower frequency
+        if avg_time_between_positions > 336:
+            return 'position_trader'
+
+        # Active Trader: High volume but doesn't fit other categories
+        if num_positions >= self.ACTIVE_TRADER_THRESHOLD:
+            return 'active_trader'
+
+        # Default: Normal trader
         return 'normal'
 
     def _calculate_holding_times(self, df_sorted: pd.DataFrame) -> float:
