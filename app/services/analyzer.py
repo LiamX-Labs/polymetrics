@@ -41,10 +41,14 @@ class WalletAnalyzer:
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
         df['realized_pnl'] = df['realizedPnl'].astype(float)
         df['avg_price'] = df['avgPrice'].astype(float)
-        df['total_bought'] = df['totalBought'].astype(float)  # This is the actual $ amount invested
+        df['total_bought'] = df['totalBought'].astype(float)  # Number of shares purchased
 
-        # Calculate exit price from PnL and investment
-        # Formula: realizedPnl = totalBought * (exitPrice - avgPrice)
+        # Calculate position size in dollars (actual investment amount)
+        # Investment = totalBought (shares) × avgPrice (price per share)
+        df['position_size_dollars'] = df['total_bought'] * df['avg_price']
+
+        # Calculate exit price from PnL
+        # Formula: realizedPnl = totalBought × (exitPrice - avgPrice)
         # Therefore: exitPrice = (realizedPnl / totalBought) + avgPrice
         df['exit_price'] = (df['realized_pnl'] / df['total_bought']) + df['avg_price']
         df['exit_price'] = df['exit_price'].fillna(0)
@@ -76,10 +80,10 @@ class WalletAnalyzer:
         best_trade = df['realized_pnl'].max()
         worst_trade = df['realized_pnl'].min()
 
-        # Position sizing - total_bought is already the $ amount invested
-        avg_position_size = df['total_bought'].mean()
-        median_position_size = df['total_bought'].median()
-        total_volume = df['total_bought'].sum()
+        # Position sizing - calculate from dollar investment amounts
+        avg_position_size = df['position_size_dollars'].mean()
+        median_position_size = df['position_size_dollars'].median()
+        total_volume = df['position_size_dollars'].sum()
 
         # Trading frequency analysis
         avg_trades_per_position = df['transactions'].mean() if 'transactions' in df.columns else 1
@@ -92,8 +96,8 @@ class WalletAnalyzer:
         holding_times = self._calculate_holding_times(df_sorted)
 
         # Calculate ROI for each position: (PnL / amount invested) * 100
-        # ROI = (realizedPnl / totalBought) * 100
-        df['roi'] = (df['realized_pnl'] / df['total_bought'] * 100).fillna(0)
+        # ROI = (realizedPnl / (totalBought × avgPrice)) * 100
+        df['roi'] = (df['realized_pnl'] / df['position_size_dollars'] * 100).fillna(0)
 
         # Prepare position list for database storage
         positions_list = []
@@ -104,8 +108,8 @@ class WalletAnalyzer:
                 'outcome': row.get('outcome', 'Unknown'),
                 'side': row.get('side', 'Unknown'),
                 'avg_entry_price': float(row.get('avgPrice', 0)),
-                'exit_price': float(row.get('price', 0)),
-                'position_size': float(row.get('totalBought', 0)),
+                'exit_price': float(row.get('exit_price', 0)),
+                'position_size': float(row.get('position_size_dollars', 0)),  # Store $ amount invested
                 'realized_pnl': float(row.get('realizedPnl', 0)),
                 'roi': float(row.get('roi', 0)),
                 'num_trades': int(row.get('transactions', 1)),
@@ -304,7 +308,7 @@ class WalletAnalyzer:
                 'hours': list(range(24)),
                 'values': [hourly_dict.get(h, 0) for h in range(24)],
             },
-            'position_sizes': df['total_bought'].tolist(),
+            'position_sizes': df['position_size_dollars'].tolist(),
             'roi_distribution': df['roi'].tolist() if 'roi' in df.columns else [],
             'drawdown': drawdown.tolist(),
             'entry_vs_pnl': {
@@ -312,7 +316,7 @@ class WalletAnalyzer:
                 'pnl': df['realized_pnl'].tolist(),
             },
             'size_vs_pnl': {
-                'sizes': df['total_bought'].tolist(),
+                'sizes': df['position_size_dollars'].tolist(),
                 'pnl': df['realized_pnl'].tolist(),
             },
         }
