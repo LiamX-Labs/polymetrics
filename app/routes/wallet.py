@@ -139,15 +139,8 @@ def analyze_wallet():
                              message='Please provide a valid Ethereum address starting with 0x')
 
     try:
-        # Check if wallet exists in database and is recent (< 1 hour old)
-        db = get_session()
-        wallet = db.query(Wallet).filter_by(address=wallet_address).first()
-
-        if wallet and (datetime.utcnow() - wallet.last_analyzed).total_seconds() < 3600:
-            logger.info(f"Using cached data for wallet {wallet_address[:10]}...")
-            return redirect(url_for('wallet.view_wallet', address=wallet_address))
-
         # Check if analysis is already in progress
+        db = get_session()
         current_progress = progress_tracker.get(wallet_address)
         if current_progress and current_progress['status'] in ['fetching', 'analyzing', 'saving']:
             logger.info(f"Analysis already in progress for {wallet_address[:10]}...")
@@ -253,12 +246,14 @@ def view_wallet(address):
     filtered_metrics = None
     if time_range != 'all' and positions:
         # Recalculate metrics using analyzer
+        # IMPORTANT: p.position_size is already stored as dollars (totalBought × avgPrice)
+        # To get shares back: shares = position_size / avgPrice
         positions_data = [
             {
                 'timestamp': int(p.close_timestamp.timestamp()) if p.close_timestamp else 0,
                 'realizedPnl': p.realized_pnl,
                 'avgPrice': p.avg_entry_price,
-                'totalBought': p.position_size,
+                'totalBought': p.position_size / p.avg_entry_price if p.avg_entry_price > 0 else 0,  # Convert back to shares
                 'outcome': p.outcome,
                 'exitPrice': p.exit_price or 0,
             }
