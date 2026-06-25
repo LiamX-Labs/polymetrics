@@ -11,6 +11,8 @@ Polymetrics is a production-ready, full-stack analytics platform built for quant
 
 **Live Demo**: [View Screenshots](#-user-interface) | **GitHub**: [LiamX-Labs/polymetrics](https://github.com/LiamX-Labs/polymetrics)
 
+![Polymetrics Homepage Dashboard](docs/screenshots/homepage-dashboard.png)
+
 ---
 
 ## 🎯 Executive Summary
@@ -751,6 +753,9 @@ def expensive_calculation(wallet_address):
 ## 🎨 User Interface
 
 ### Homepage Dashboard
+
+![Homepage Dashboard](docs/screenshots/homepage-dashboard.png)
+
 - **Live Leaderboard Preview**: Top 5 daily traders from Polymarket API
 - **Platform Statistics**: Total wallets analyzed, positions tracked, volume processed
 - **Database Leaderboards**: Top 10 by PnL, win rate, and profit factor
@@ -759,7 +764,14 @@ def expensive_calculation(wallet_address):
 - **Verified Badges**: Display verified traders with checkmark
 - **Profile Images**: User avatars from Polymarket
 
+**Database Leaderboards** — top performers by PnL, win rate, and profit factor:
+
+![Database Leaderboards](docs/screenshots/database-leaderboards.png)
+
 ### Leaderboard Page
+
+![Live Leaderboard](docs/screenshots/leaderboard.png)
+
 - **Category Filters**: Dropdown for 10+ market categories
 - **Time Period Selection**: Day/Week/Month/All-time toggle
 - **Live + Database Merge**: Shows both Polymarket leaderboard and local analytics
@@ -772,6 +784,9 @@ def expensive_calculation(wallet_address):
 **4 Tab Navigation**:
 
 1. **Overview Tab**:
+
+   ![Wallet Overview Tab](docs/screenshots/wallet-overview.png)
+
    - Performance summary card (PnL, win rate, profit factor, Sharpe ratio)
    - Trading style badge (Scalper/Day/Swing/Position)
    - Activity level (HFT/Active/Moderate/Casual)
@@ -779,6 +794,9 @@ def expensive_calculation(wallet_address):
    - Volume metrics (total volume, avg position size, median size)
 
 2. **Charts Tab** (10 Interactive Visualizations):
+
+   ![Wallet Charts Tab](docs/screenshots/wallet-charts.png)
+
    - Cumulative PnL over time (line chart)
    - Win/Loss/Breakeven distribution (donut chart)
    - PnL distribution histogram
@@ -791,11 +809,17 @@ def expensive_calculation(wallet_address):
    - Position size vs PnL scatter (sizing effectiveness)
 
 3. **Top Trades Tab**:
+
+   ![Wallet Top Trades Tab](docs/screenshots/wallet-top-trades.png)
+
    - Best 10 trades (highest PnL)
    - Worst 10 trades (lowest PnL)
    - Trade details: market, outcome, entry/exit price, ROI, duration
 
 4. **All Positions Tab**:
+
+   ![Wallet All Positions Tab](docs/screenshots/wallet-all-positions.png)
+
    - Paginated table (50 rows/page)
    - Sortable columns (PnL, ROI, date, market)
    - Search/filter by market title
